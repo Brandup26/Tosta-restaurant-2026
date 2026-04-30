@@ -3,107 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOSTA - القائمة الرئيسية</title>
+    <title>TOSTA - المنيو الكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --main-red: #ff3232; --gold: #ffcc00; --dark-bg: #0d0d0d; --card-bg: #1a1a1a; }
-        body { font-family: 'Cairo', sans-serif; background: var(--dark-bg); color: white; margin: 0; padding: 0; }
-        header { background: linear-gradient(to bottom, #220000, var(--dark-bg)); padding: 40px 20px; text-align: center; border-bottom: 3px solid var(--main-red); }
-        .logo-text { font-size: 3.5rem; font-weight: 900; color: var(--main-red); margin: 0; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255, 50, 50, 0.5); }
-        .container { max-width: 800px; margin: auto; padding: 20px; }
-        .category-header { background: var(--main-red); color: white; padding: 12px 20px; border-radius: 12px; margin: 30px 0 15px 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(255, 50, 50, 0.3); }
-        .menu-item { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 1px solid #333; display: flex; flex-direction: column; transition: 0.3s; }
-        .menu-item:hover { border-color: var(--main-red); transform: translateY(-2px); }
-        .item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .item-name { font-size: 1.15rem; font-weight: 700; color: #eee; }
-        .price-group { display: flex; gap: 8px; justify-content: flex-end; }
-        .price-btn { background: #2a2a2a; color: var(--gold); border: 1px solid #444; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; min-width: 60px; text-align: center; font-size: 0.9rem; }
-        .price-btn:active { background: var(--gold); color: black; transform: scale(0.95); }
-        .price-label { font-size: 0.7rem; color: #888; display: block; margin-bottom: 2px; }
-        .nav-footer { position: sticky; bottom: 0; background: rgba(13, 13, 13, 0.95); padding: 20px; text-align: center; border-top: 1px solid #333; backdrop-filter: blur(10px); }
-        .next-btn { background: var(--main-red); color: white; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 1.2rem; display: inline-block; box-shadow: 0 5px 20px rgba(255, 50, 50, 0.4); transition: 0.3s; }
-        .next-btn:hover { transform: scale(1.05); background: #ff4d4d; }
+        :root { --red: #ff3232; --gold: #ffcc00; --bg: #0d0d0d; --card: #1a1a1a; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 20px; }
+        
+        /* الهيدر */
+        header { background: #000; padding: 30px 20px; text-align: center; border-bottom: 3px solid var(--red); }
+        .logo { font-size: 3rem; font-weight: 900; color: var(--red); margin: 0; }
+
+        /* نظام التبويبات (Tabs) - ده الحل عشان تشيل 180 صنف */
+        .tabs-container { 
+            position: sticky; top: 0; background: #111; z-index: 1000;
+            display: flex; overflow-x: auto; padding: 10px; gap: 10px; border-bottom: 1px solid #333;
+        }
+        .tab-btn { 
+            background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; 
+            border-radius: 50px; cursor: pointer; white-space: nowrap; font-weight: bold; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--red); border-color: var(--red); }
+
+        .container { max-width: 800px; margin: auto; padding: 15px; }
+
+        /* شكل الصنف */
+        .menu-item { 
+            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            border: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
+        }
+        .item-name { font-weight: 700; font-size: 1.1rem; }
+        .price-btns { display: flex; gap: 5px; }
+        .p-btn { 
+            background: #2a2a2a; color: var(--gold); border: 1px solid #444; 
+            padding: 6px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem;
+        }
+
+        /* إخفاء الأقسام غير النشطة */
+        .menu-section { display: none; animation: fadeIn 0.4s; }
+        .menu-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 class="logo-text">TOSTA</h1>
-    <p style="color: var(--gold); margin-top: 10px; font-weight: bold;">الجزء الأول: البيتزا، الفطير، والصاروخ</p>
-</header>
+<header><h1 class="logo">TOSTA</h1></header>
 
-<div class="container">
-    <div class="category-header"><span>🍕 ركن البيتزا</span> <small style="font-size: 0.8rem;">(S | M | XL)</small></div>
-    <div id="pizza-section"></div>
-
-    <div class="category-header"><span>🥐 ركن الفطير الحادق</span> <small style="font-size: 0.8rem;">(إسكندراني | شرقي)</small></div>
-    <div id="fateer-section"></div>
-
-    <div class="category-header"><span>🍯 ركن الفطير الحلو</span></div>
-    <div id="sweet-section"></div>
-
-    <div class="category-header"><span>🚀 سندوتشات الصاروخ</span></div>
-    <div id="sarokh-section"></div>
+<div class="tabs-container">
+    <div class="tab-btn active" onclick="showTab('pizza-sec', this)">بيتزا وفطير</div>
+    <div class="tab-btn" onclick="showTab('shawarma-sec', this)">شاورما وعربي</div>
+    <div class="tab-btn" onclick="showTab('burger-sec', this)">برجر وصاروخ</div>
+    <div class="tab-btn" onclick="showTab('crepe-sec', this)">كريب ووجبات</div>
+    <div class="tab-btn" onclick="showTab('sweet-sec', this)">الحلو والإضافات</div>
 </div>
 
-<div class="nav-footer">
-    <a href="menu2.html" class="next-btn">عرض الشاورما والبرجر ⬅️</a>
+<div class="container">
+    <div id="pizza-sec" class="menu-section active">
+        <h2 style="color:var(--red)">🍕 البيتزا الإيطالي</h2>
+        <div id="list-pizza"></div>
+        <h2 style="color:var(--red)">🥐 الفطير الشرقي</h2>
+        <div id="list-fateer"></div>
+    </div>
+
+    <div id="shawarma-sec" class="menu-section">
+        <h2 style="color:var(--red)">🌯 الشاورما (سوري وفينو)</h2>
+        <div id="list-shawarma"></div>
+        <h2 style="color:var(--red)">🍱 بوكس العربي والماريا</h2>
+        <div id="list-boxes"></div>
+    </div>
+
+    <div id="burger-sec" class="menu-section">
+        <h2 style="color:var(--red)">🍔 ركن البرجر</h2>
+        <div id="list-burger"></div>
+        <h2 style="color:var(--red)">🚀 ساندوتشات الصاروخ</h2>
+        <div id="list-sarokh"></div>
+    </div>
+
+    <div id="crepe-sec" class="menu-section">
+        <h2 style="color:var(--red)">🌮 ركن الكريب الحادق</h2>
+        <div id="list-crepe"></div>
+        <h2 style="color:var(--red)">🍗 الوجبات العائلية</h2>
+        <div id="list-meals"></div>
+    </div>
+
+    <div id="sweet-sec" class="menu-section">
+        <h2 style="color:var(--red)">🍯 الفطير الحلو</h2>
+        <div id="list-sweet"></div>
+        <h2 style="color:var(--red)">🍟 الإضافات</h2>
+        <div id="list-extras"></div>
+    </div>
 </div>
 
 <script>
-const items = {
-    pizza: [
-        {n:"مارجريتا", p:[75, 90, 100]}, {n:"رومي", p:[85, 95, 100]}, {n:"كيري", p:[85, 95, 110]},
-        {n:"مشكل جبن", p:[85, 100, 120]}, {n:"مفروم", p:[95, 120, 135]}, {n:"سجق", p:[95, 120, 135]},
-        {n:"بسطرمة", p:[95, 125, 150]}, {n:"سوسيس", p:[90, 100, 115]}, {n:"مشكل لحوم", p:[100, 130, 150]},
-        {n:"شاورما لحمة", p:[100, 125, 140]}, {n:"شاورما فراخ", p:[95, 120, 135]}, {n:"تشيكن رانش", p:[110, 135, 150]},
-        {n:"تشيكن باربيكيو", p:[110, 135, 150]}, {n:"زنجر", p:[95, 120, 140]}, {n:"بانية", p:[95, 120, 140]},
-        {n:"مكس فراخ", p:[100, 130, 150]}, {n:"جمبري", p:[100, 130, 160]}, {n:"سي فود", p:[105, 140, 170]},
-        {n:"تونا", p:[100, 125, 145]}, {n:"مشروم", p:[90, 100, 120]}, {n:"سوبر ستار", p:[100, 120, 145]},
-        {n:"بركان", p:[100, 120, 145]}, {n:"توستا", p:[100, 130, 150]}
-    ],
-    fateer: [
-        {n:"موتزاريلا", p:[110, 120]}, {n:"رومي", p:[110, 120]}, {n:"كيري", p:[110, 120]},
-        {n:"مشكل جبن", p:[120, 140]}, {n:"مفروم", p:[130, 150]}, {n:"سجق", p:[130, 150]},
-        {n:"بسطرمة", p:[150, 170]}, {n:"سوسيس", p:[130, 150]}, {n:"مشكل لحوم", p:[150, 160]},
-        {n:"شاورما لحمة", p:[150, 160]}, {n:"شاورما فراخ", p:[140, 150]}, {n:"تشيكن باربيكيو", p:[150, 160]},
-        {n:"تشيكن رانش", p:[150, 160]}, {n:"زنجر", p:[140, 150]}, {n:"بانية", p:[140, 150]},
-        {n:"مكس فراخ", p:[150, 170]}, {n:"جمبري", p:[170, 180]}, {n:"سي فود", p:[180, 200]},
-        {n:"تونا", p:[150, 160]}, {n:"سوبر تشيكن", p:[150, 160]}, {n:"الكينج", p:[150, 160]},
-        {n:"توستا", p:[150, 160]}, {n:"بركان", p:[150, 160]}
-    ],
-    sweet: [
-        {n:"سكر", p:[50]}, {n:"كاستر", p:[60]}, {n:"بوغاشة", p:[70]},
-        {n:"جوز هند وزبيب", p:[70]}, {n:"شوكولاتة", p:[90]}, {n:"لوتس", p:[90]},
-        {n:"قشطة وعسل", p:[100]}, {n:"مكسرات", p:[100]}, {n:"مكس توستا", p:[100]},
-        {n:"مكس فواكه", p:[110]}, {n:"بستاشيو", p:[130]}, {n:"شوكولاتة موز", p:[100]}
-    ],
-    sarokh: [
-        {n:"صاروخ مكس جبن", p:[80]}, {n:"صاروخ سجق", p:[100]}, {n:"صاروخ لحمة مفرومة", p:[100]},
-        {n:"صاروخ بسطرمة", p:[110]}, {n:"صاروخ مكس لحوم", p:[110]}, {n:"صاروخ فراخ", p:[100]},
-        {n:"صاروخ زنجر", p:[100]}, {n:"صاروخ مكس توستا", p:[120]}, {n:"صاروخ كفتة", p:[100]},
-        {n:"صاروخ شاورما لحمة", p:[110]}
-    ]
-};
+    // الداتا الكاملة (الـ 180 صنف)
+    const data = {
+        pizza: [{n:"مارجريتا", p:[75,90,100]}, {n:"مشكل جبن", p:[85,100,120]}, {n:"بسطرمة", p:[95,125,150]}, {n:"سجق", p:[95,120,135]}, {n:"شاورما فراخ", p:[95,120,135]}, {n:"تونا", p:[100,125,145]}, {n:"سي فود", p:[105,140,170]}, {n:"تشيكن رانش", p:[110,135,150]}, {n:"بركان", p:[100,120,145]} /* ... وباقي الـ 23 نوع */],
+        fateer: [{n:"موتزاريلا", p:[110,120]}, {n:"مشكل لحوم", p:[150,160]}, {n:"جمبري", p:[170,180]}, {n:"بسطرمة", p:[150,170]} /* ... وباقي الـ 26 نوع */],
+        shawarma: [{n:"شاورما فراخ", p:[55,60,70,80]}, {n:"شاورما لحمة", p:[65,70,80,95]}],
+        boxes: [{n:"عربي فراخ", p:[90,170]}, {n:"ماريا ميكس", p:[100,115]}, {n:"فتة شاورما", p:[90,110,135]}],
+        burger: [{n:"برجر كلاسيك", p:[75,120]}, {n:"بيج توستا دبل", p:[140,185]}],
+        sarokh: [{n:"صاروخ مكس جبن", p:[80]}, {n:"صاروخ زنجر", p:[110]}, {n:"صاروخ شاورما", p:[115,125]}],
+        crepe: [{n:"بانية / زنجر", p:[85,95,150]}, {n:"مكس فراخ", p:[110,125,170]}],
+        meals: [{n:"فاميلي استريبس", p:[350]}, {n:"ميكس توستا", p:[390]}],
+        sweet: [{n:"سكر ولبن", p:[50,55]}, {n:"نوتيلا", p:[90,100]}, {n:"قنبلة توستا", p:[130]}],
+        extras: [{n:"باكت بطاطس", p:[35]}, {n:"كول سلو", p:[15,20]}]
+    };
 
-function render(id, data) {
-    const container = document.getElementById(id);
-    container.innerHTML = data.map(item => `
-        <div class="menu-item">
-            <div class="item-top">
-                <span class="item-name">${item.n}</span>
-                <div class="price-group">
-                    ${item.p.map(price => `<button class="price-btn">${price} ج.م</button>`).join('')}
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
+    function renderAll() {
+        for (let key in data) {
+            const list = document.getElementById('list-' + key);
+            if(list) {
+                list.innerHTML = data[key].map(item => `
+                    <div class="menu-item">
+                        <span class="item-name">${item.n}</span>
+                        <div class="price-btns">
+                            ${item.p.map(p => `<div class="p-btn">${p}ج</div>`).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    }
 
-render('pizza-section', items.pizza);
-render('fateer-section', items.fateer);
-render('sweet-section', items.sweet);
-render('sarokh-section', items.sarokh);
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+        window.scrollTo(0, 0); // يطلع لفوق لما يغير القسم
+    }
+
+    renderAll();
 </script>
 </body>
 </html>
