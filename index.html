@@ -3,185 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tosta - منيو توستا الكامل</title>
+    <title>TOSTA - المنيو الكامل والحصري</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --main-red: #e62222; --dark-bg: #0d0d0d; --card-bg: #1a1a1a; --gold: #ffcc00; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--dark-bg); color: #fff; margin: 0; overflow-x: hidden; }
+        :root { --red: #e62222; --bg: #0b0b0b; --card: #161616; --gold: #ffcc00; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: #fff; margin: 0; padding-bottom: 100px; }
+        header { background: #000; padding: 20px; text-align: center; border-bottom: 3px solid var(--red); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); margin: 0; }
+        .container { max-width: 600px; margin: auto; padding: 10px; }
+        .cat-box { background: var(--card); border-radius: 12px; margin-bottom: 10px; border: 1px solid #222; overflow: hidden; }
+        .cat-btn { padding: 15px; background: #1a1a1a; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; color: var(--red); font-size: 1.1rem; }
+        .items-list { display: none; padding: 5px; }
+        .items-list.open { display: block; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #222; }
+        .add-btn { background: var(--red); color: white; border: none; width: 35px; height: 35px; border-radius: 8px; font-size: 1.4rem; cursor: pointer; }
         
-        /* الهيدر */
-        header { background: #000; padding: 20px; text-align: center; border-bottom: 3px solid var(--main-red); }
-        .logo { font-weight: 900; font-size: 2.5rem; color: var(--main-red); margin: 0; text-shadow: 2px 2px #000; }
-        
-        /* تصنيفات المنيو */
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .category-section { margin-bottom: 15px; border-radius: 12px; overflow: hidden; border: 1px solid #333; }
-        .category-header { background: #222; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1rem; border-left: 5px solid var(--main-red); }
-        .category-header:hover { background: #282828; }
-        .items-list { display: none; background: #111; padding: 10px; }
-        .items-list.active { display: block; }
+        /* السلة العائمة */
+        .cart-fab { position: fixed; bottom: 20px; left: 20px; background: var(--red); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2000; box-shadow: 0 4px 15px rgba(230,34,34,0.5); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--gold); color: #000; width: 22px; height: 22px; border-radius: 50%; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
-        /* كارت الصنف */
-        .item-card { background: var(--card-bg); margin-bottom: 8px; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .item-info b { display: block; font-size: 1rem; color: #eee; }
-        .add-btn { background: var(--main-red); color: #fff; border: none; width: 40px; height: 40px; border-radius: 8px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* النافذة المنبثقة (Popup) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1a1a1a; width: 90%; max-width: 400px; border-radius: 15px; border: 1px solid var(--main-red); padding: 20px; text-align: center; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .size-option { background: #333; padding: 15px; margin: 10px 0; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; transition: 0.2s; }
-        .size-option:hover { background: var(--main-red); }
-        .close-modal { margin-top: 15px; background: none; border: 1px solid #555; color: #aaa; padding: 8px 20px; border-radius: 5px; cursor: pointer; }
-
-        /* شريط السلة */
-        #cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--main-red); padding: 15px; text-align: center; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); z-index: 999; }
+        /* نافذة المقاسات والسلة */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .m-content { background: #1a1a1a; width: 100%; max-width: 350px; border-radius: 15px; padding: 20px; border: 1px solid var(--red); }
+        .sz-row { background: #252525; padding: 12px; margin: 8px 0; border-radius: 10px; display: flex; justify-content: space-between; cursor: pointer; }
+        .cart-p { position: fixed; bottom: -100%; left: 0; right: 0; background: #111; height: 80vh; z-index: 4000; border-radius: 20px 20px 0 0; transition: 0.4s; padding: 20px; }
+        .cart-p.show { bottom: 0; }
     </style>
 </head>
 <body>
 
-<header><h1 class="logo">TOSTA</h1><p style="margin:5px 0 0; color:#888;">ش الصحة القديم - متفرع من ش الشعراوي</p></header>
+<header><h1 class="logo">TOSTA MENU</h1></header>
 
-<div class="container" id="menu-container"></div>
+<div class="container" id="menu-data"></div>
 
-<div id="cart-bar" onclick="alert('سلة الطلبات قيد التطوير')">🛒 عرض السلة (<span id="total-price">0</span> ج)</div>
+<div class="cart-fab" onclick="showCart()"><div class="badge" id="count">0</div>🛒</div>
 
-<div class="modal" id="size-modal">
-    <div class="modal-content">
-        <h2 id="modal-item-name" style="color:var(--gold); margin-top:0;">اسم الصنف</h2>
-        <p style="color:#bbb;">اختر الحجم / النوع:</p>
-        <div id="size-options-container"></div>
-        <button class="close-modal" onclick="closeModal()">إلغاء</button>
+<div class="cart-p" id="cart-p">
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+        <h3>طلباتك 🍔</h3><button onclick="showCart()" style="color:red; background:none; border:none; font-family:'Cairo';">إغلاق</button>
+    </div>
+    <div id="cart-items" style="overflow-y:auto; max-height:60%;"></div>
+    <div style="padding-top:20px;">
+        <h3 id="total-price">الإجمالي: 0 ج</h3>
+        <button onclick="sendOrder()" style="width:100%; background:#25d366; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-family:'Cairo';">طلب عبر واتساب</button>
     </div>
 </div>
 
+<div class="modal" id="modal"><div class="m-content" id="modal-body"></div></div>
+
 <script>
-const fullMenu = [
+// تفريغ كامل للمنيو من الصور 1000165574.jpg و 1000165575.jpg
+const menu = [
+    { cat: "ركن البيتزا (إيطالي)", items: [
+        { n: "مارجريتا", p: { "صغير": 75, "وسط": 85, "كبير": 100 } },
+        { n: "رومي", p: { "صغير": 85, "وسط": 95, "كبير": 100 } },
+        { n: "كيري", p: { "صغير": 85, "وسط": 95, "كبير": 110 } },
+        { n: "مشكل جبن", p: { "صغير": 85, "وسط": 95, "كبير": 110 } },
+        { n: "مفروم", p: { "صغير": 95, "وسط": 120, "كبير": 135 } },
+        { n: "بسطرمة", p: { "صغير": 95, "وسط": 120, "كبير": 150 } },
+        { n: "سجق / سوسيس", p: { "صغير": 90, "وسط": 100, "كبير": 115 } },
+        { n: "مشكل لحوم", p: { "صغير": 100, "وسط": 130, "كبير": 150 } },
+        { n: "شاورما لحمة / فراخ", p: { "صغير": 100, "وسط": 125, "كبير": 140 } },
+        { n: "تشيكن باربيكيو / رانش", p: { "صغير": 110, "وسط": 135, "كبير": 150 } },
+        { n: "جمبري / سي فود", p: { "صغير": 105, "وسط": 140, "كبير": 170 } },
+        { n: "تونا", p: { "صغير": 100, "وسط": 120, "كبير": 145 } }
+    ]},
+    { cat: "ساندوتشات (فينو / سوري / XL)", items: [
+        { n: "بطاطس", p: { "فينو": 15, "سوري": 20, "XL": 30 } },
+        { n: "كبدة", p: { "فينو": 20, "سوري": 30, "XL": 40 } },
+        { n: "جبنة مقلية", p: { "فينو": 20, "سوري": 25, "XL": 40 } },
+        { n: "بطاطس تشيز / رومي", p: { "فينو": 25, "سوري": 30, "XL": 40 } },
+        { n: "بانية / زنجر / كريسبي", p: { "فينو": 55, "سوري": 70, "XL": 80 } },
+        { n: "سجق اسكندراني", p: { "فينو": 50, "سوري": 60, "XL": 70 } },
+        { n: "تشيكن كوردن بلو", p: { "فينو": 70, "سوري": 80, "XL": 80 } },
+        { n: "كفتة لحم / فراخ", p: { "فينو": 60, "سوري": 70, "XL": 80 } },
+        { n: "جمبري كريسبي", p: { "فينو": 80, "سوري": 90, "XL": 90 } }
+    ]},
+    { cat: "كريب حادق", items: [
+        { n: "بطاطس", p: { "عادي": 60, "كونو": 70, "سوبر": 100 } },
+        { n: "شيدر / كيري", p: { "عادي": 65, "كونو": 75, "سوبر": 110 } },
+        { n: "مشكل جبن", p: { "عادي": 75, "كونو": 85, "سوبر": 125 } },
+        { n: "سجق / مفروم / سوسيس", p: { "عادي": 80, "كونو": 90, "سوبر": 125 } },
+        { n: "بسطرمة", p: { "عادي": 85, "كونو": 100, "سوبر": 140 } },
+        { n: "بانية / زنجر / كريسبي", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
+        { n: "جمبري / سي فود", p: { "عادي": 110, "كونو": 125, "سوبر": 170 } }
+    ]},
     { cat: "ركن الوجبات", items: [
-        { name: "فاميلي استريبس (12 قطعة)", prices: { "وجبة": 350 } },
-        { name: "كريسبي استريبس (6 قطع)", prices: { "وجبة": 200 } },
-        { name: "لايت استريبس (3 قطع)", prices: { "وجبة": 120 } },
-        { name: "فاميلي اكسترا (18 قطعة)", prices: { "وجبة": 430 } },
-        { name: "وجبة شيش طاووق (9 قطع)", prices: { "وجبة": 190 } },
-        { name: "فاميلي ميكس (3 زنجر + 3 بانية + 3 شيش)", prices: { "وجبة": 330 } },
-        { name: "ميكس توستا (6 بانية + 6 استريبس)", prices: { "وجبة": 390 } },
-        { name: "وجبة كوردن بلو (3 قطع)", prices: { "وجبة": 190 } },
-        { name: "وجبة بانية (3 قطع)", prices: { "وجبة": 120 } },
-        { name: "وجبة بانية (6 قطع)", prices: { "وجبة": 190 } },
-        { name: "وجبة بانية (12 قطعة)", prices: { "وجبة": 330 } }
+        { n: "فاميلي استريبس (12 قطعة)", p: { "وجبة": 350 } },
+        { n: "كريسبي استريبس (6 قطع)", p: { "وجبة": 200 } },
+        { n: "لايت استريبس (3 قطع)", p: { "وجبة": 120 } },
+        { n: "فاميلي ميكس", p: { "وجبة": 330 } },
+        { n: "فاميلي اكسترا", p: { "وجبة": 430 } },
+        { n: "وجبة شيش طاووق", p: { "وجبة": 190 } },
+        { n: "وجبة كوردن بلو", p: { "وجبة": 190 } },
+        { n: "ميكس توستا", p: { "وجبة": 390 } }
     ]},
-    { cat: "ساندوتشات (فينو - سوري - XL)", items: [
-        { name: "بطاطس", prices: { "فينو": 15, "سوري": 20, "XL": 30 } },
-        { name: "كبدة", prices: { "فينو": 20, "سوري": 30, "XL": 40 } },
-        { name: "جبنة مقلية", prices: { "فينو": 20, "سوري": 25, "XL": 40 } },
-        { name: "بطاطس تشيز / رومي / موتزاريلا", prices: { "فينو": 30, "سوري": 35, "XL": 40 } },
-        { name: "بانية / زنجر / كريسبي", prices: { "فينو": 55, "سوري": 70, "XL": 80 } },
-        { name: "سجق اسكندراني", prices: { "فينو": 50, "سوري": 60, "XL": 70 } },
-        { name: "تشيكن كوردن بلو", prices: { "فينو": 70, "سوري": 80, "XL": 80 } },
-        { name: "كفتة لحم / فراخ", prices: { "فينو": 60, "سوري": 70, "XL": 80 } },
-        { name: "جمبري كريسبي / شيش طاووق", prices: { "فينو": 80, "سوري": 90, "XL": 90 } }
+    { cat: "ركن المكرونة", items: [
+        { n: "مكرونة فراخ / لحمة", p: { "أبيض": 80, "أحمر": 80 } },
+        { n: "مكرونة نيجرسكو", p: { "صوص": 90 } },
+        { n: "مكرونة جمبري / سي فود", p: { "أبيض": 110, "أحمر": 110 } },
+        { n: "مكرونة الفريدو", p: { "صوص": 90 } }
     ]},
-    { cat: "ركن البيتزا (44 صنف - كاملة)", items: [
-        { name: "مارجريتا", prices: { "صغير": 75, "وسط": 85, "كبير": 100 } },
-        { name: "رومي / كيري / مشكل جبن", prices: { "صغير": 85, "وسط": 95, "كبير": 110 } },
-        { name: "مفروم / سجق / سوسيس", prices: { "صغير": 95, "وسط": 120, "كبير": 135 } },
-        { name: "بسطرمة / شاورما لحمة / فراخ", prices: { "صغير": 100, "وسط": 125, "كبير": 140 } },
-        { name: "تشيكن باربيكيو / رانش", prices: { "صغير": 110, "وسط": 135, "كبير": 150 } },
-        { name: "زنجر / بانية / مكس فراخ", prices: { "صغير": 95, "وسط": 120, "كبير": 140 } },
-        { name: "جمبري / سي فود", prices: { "صغير": 105, "وسط": 140, "كبير": 170 } },
-        { name: "سوبر ستار / بركان / توستا", prices: { "صغير": 100, "وسط": 120, "كبير": 145 } },
-        { name: "تونا / كواترو / مشروم", prices: { "صغير": 100, "وسط": 120, "كبير": 140 } }
+    { cat: "سندوتشات الصاروخ", items: [
+        { n: "صاروخ مكس جبن", p: { "صاروخ": 80 } },
+        { n: "صاروخ سجق / لحمة / بسطرمة", p: { "صاروخ": 100 } },
+        { n: "صاروخ زنجر / بانية / كفتة", p: { "صاروخ": 110 } }
     ]},
-    { cat: "ركن الفطير (شرقي - اسكندراني)", items: [
-        { name: "فطير مشكل جبن", prices: { "شرقي": 120, "ايطالي": 130 } },
-        { name: "فطير سجق / سوسيس / مفروم", prices: { "شرقي": 130, "ايطالي": 140 } },
-        { name: "فطير مشكل لحوم / شاورما", prices: { "شرقي": 150, "اسكندراني": 170 } },
-        { name: "فطير زنجر / بانية / شيش", prices: { "شرقي": 150, "ايطالي": 160 } },
-        { name: "فطير جمبري / سي فود", prices: { "شرقي": 170, "اسكندراني": 190 } }
+    { cat: "ركن الفطير الحلو", items: [
+        { n: "سكر وكاستر", p: { "فطيرة": 50 } },
+        { n: "بغاشة / شوكولاتة", p: { "فطيرة": 70 } },
+        { n: "مكس شوكولاتة ومكسرات", p: { "فطيرة": 100 } },
+        { n: "فواكه وقشطة وعسل", p: { "فطيرة": 110 } }
     ]},
-    { cat: "كريب حادق (عادي - كونو - سوبر)", items: [
-        { name: "بطاطس / بوم", prices: { "عادي": 60, "كونو": 70, "سوبر": 100 } },
-        { name: "مفروم / سجق / سوسيس", prices: { "عادي": 75, "كونو": 85, "سوبر": 125 } },
-        { name: "بانية / كريسبي / زنجر", prices: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
-        { name: "برجر / مكس فراخ", prices: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
-        { name: "جمبري / سي فود", prices: { "عادي": 120, "كونو": 135, "سوبر": 170 } }
-    ]},
-    { cat: "ركن البرجر", items: [
-        { name: "كلاسيك / برجر تشيز", prices: { "فراخ": 70, "لحم": 80 } },
-        { name: "تشيكن رانش / فاير تاك", prices: { "ساندوتش": 90 } },
-        { name: "دبل دليمار / دبل بيج فاير", prices: { "دبل": 130 } },
-        { name: "تربل دليمار", prices: { "تربل": 170 } },
-        { name: "سماتش برجر", prices: { "ساندوتش": 70 } }
-    ]},
-    { cat: "المكرونة والريزو", items: [
-        { name: "مكرونة فراخ / لحمة / سجق", prices: { "أبيض": 80, "أحمر": 80 } },
-        { name: "مكرونة نجرسكو / الفريدو", prices: { "طبق": 90 } },
-        { name: "مكرونة سي فود", prices: { "طبق": 135 } },
-        { name: "ريزو (كبدة/شاورما/زنجر)", prices: { "صغير": 70, "كبير": 90 } }
+    { cat: "إضافات", items: [
+        { n: "باكت فارم", p: { "إضافة": 30 } },
+        { n: "باكت تشيز / موتزاريلا", p: { "إضافة": 35 } },
+        { n: "كول سلو", p: { "إضافة": 15 } },
+        { n: "صوص (تاتشيس/رانش)", p: { "إضافة": 20 } }
     ]}
 ];
 
-let cartTotal = 0;
+let cart = [];
 
-function renderMenu() {
-    const container = document.getElementById('menu-container');
-    fullMenu.forEach((section, index) => {
-        let html = `
-            <div class="category-section">
-                <div class="category-header" onclick="toggleCat(${index})">
-                    ${section.cat} <span>▼</span>
-                </div>
-                <div class="items-list" id="cat-${index}">
-        `;
-        section.items.forEach(item => {
-            html += `
-                <div class="item-card">
-                    <div class="item-info"><b>${item.name}</b></div>
-                    <button class="add-btn" onclick='openModal("${item.name}", ${JSON.stringify(item.prices)})'>+</button>
-                </div>
-            `;
+function render() {
+    const box = document.getElementById('menu-data');
+    menu.forEach((c, i) => {
+        let h = `<div class="cat-box"><div class="cat-btn" onclick="toggle(${i})">${c.cat} <span>▼</span></div><div class="items-list" id="l-${i}">`;
+        c.items.forEach(it => {
+            h += `<div class="item"><b>${it.n}</b><button class="add-btn" onclick='openSizes("${it.n}", ${JSON.stringify(it.p)})'>+</button></div>`;
         });
-        html += `</div></div>`;
-        container.innerHTML += html;
+        box.innerHTML += h + `</div></div>`;
     });
 }
 
-function toggleCat(i) {
-    document.getElementById(`cat-${i}`).classList.toggle('active');
+function toggle(i) { document.getElementById(`l-${i}`).classList.toggle('open'); }
+
+function openSizes(n, ps) {
+    const b = document.getElementById('modal-body');
+    let h = `<h3>${n}</h3><p>اختر الحجم:</p>`;
+    for(let s in ps) h += `<div class="sz-row" onclick="addToCart('${n}','${s}',${ps[s]})"><span>${s}</span><span>${ps[s]} ج</span></div>`;
+    h += `<button onclick="closeM()" style="width:100%; margin-top:10px; background:none; border:none; color:#666; cursor:pointer;">إلغاء</button>`;
+    b.innerHTML = h;
+    document.getElementById('modal').style.display = 'flex';
 }
 
-function openModal(name, prices) {
-    const modal = document.getElementById('size-modal');
-    const container = document.getElementById('size-options-container');
-    document.getElementById('modal-item-name').innerText = name;
-    container.innerHTML = '';
-    
-    for (let size in prices) {
-        container.innerHTML += `
-            <div class="size-option" onclick="addToCart('${name}', '${size}', ${prices[size]})">
-                <span>${size}</span>
-                <span>${prices[size]} ج</span>
-            </div>
-        `;
-    }
-    modal.style.display = 'flex';
+function closeM() { document.getElementById('modal').style.display = 'none'; }
+
+function addToCart(n, s, p) {
+    cart.push({ n, s, p });
+    updateUI();
+    closeM();
 }
 
-function closeModal() {
-    document.getElementById('size-modal').style.display = 'none';
+function updateUI() {
+    document.getElementById('count').innerText = cart.length;
+    let t = 0;
+    document.getElementById('cart-items').innerHTML = cart.map((i, idx) => {
+        t += i.p;
+        return `<div class="item"><div>${i.n} (${i.s})</div><div>${i.p} ج <button onclick="rm(${idx})" style="color:red; background:none; border:none; cursor:pointer;">X</button></div></div>`;
+    }).join('');
+    document.getElementById('total-price').innerText = `الإجمالي: ${t} ج`;
 }
 
-function addToCart(name, size, price) {
-    cartTotal += price;
-    document.getElementById('total-price').innerText = cartTotal;
-    closeModal();
-    // إضافة تأثير بصري بسيط
-    const bar = document.getElementById('cart-bar');
-    bar.style.transform = 'scale(1.05)';
-    setTimeout(() => bar.style.transform = 'scale(1)', 200);
+function rm(i) { cart.splice(i, 1); updateUI(); }
+
+function showCart() { document.getElementById('cart-p').classList.toggle('show'); }
+
+function sendOrder() {
+    if(!cart.length) return alert("السلة فارغة!");
+    let msg = "طلب جديد من توستا:\n" + cart.map(i => `- ${i.n} (${i.s}) : ${i.p}ج`).join('\n') + `\n\n*الإجمالي: ${document.getElementById('total-price').innerText}*`;
+    window.open(`https://wa.me/201030353060?text=${encodeURIComponent(msg)}`);
 }
 
-renderMenu();
+render();
 </script>
 </body>
 </html>
