@@ -3,32 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tosta - توستا</title>
+    <title>Tosta Menu - منيو توستا الكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --red: #e62222; --bg: #0b0b0b; --card: #161616; --gold: #ffcc00; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: #fff; margin: 0; padding-bottom: 70px; }
         header { text-align: center; padding: 15px; border-bottom: 2px solid var(--red); background: #000; }
-        .logo { width: 65px; border-radius: 50%; border: 1px solid var(--red); }
         .container { max-width: 600px; margin: auto; padding: 10px; }
         .cat-btn { background: #1a1a1a; color: #fff; padding: 12px; border-radius: 8px; margin-top: 8px; cursor: pointer; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .items-box { display: none; margin-top: 5px; }
         .items-box.active { display: block; }
         .item-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 6px; border-right: 4px solid var(--red); display: flex; justify-content: space-between; align-items: center; }
-        .add-btn { background: var(--red); color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .add-btn { background: var(--red); color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-size: 1.5rem; cursor: pointer; }
         #cart-bar { position: fixed; bottom: 0; width: 100%; background: var(--red); color: #fff; padding: 12px 0; text-align: center; font-weight: bold; z-index: 500; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: #1a1a1a; padding: 20px; border-radius: 10px; width: 85%; max-width: 400px; text-align: center; border: 1px solid var(--red); }
         .size-opt { background: #333; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: pointer; display: flex; justify-content: space-between; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none; }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="logo.jpg" class="logo">
-    <h1 style="margin:5px 0; font-size:1.2rem;">مطعم TOSTA - توستا</h1>
-</header>
+<header><h1>TOSTA - توستا</h1></header>
 
 <div class="container" id="menu-content"></div>
 
@@ -38,102 +33,75 @@
     <div class="modal-content">
         <h3 id="modal-title" style="color:var(--gold)">اختر الحجم</h3>
         <div id="size-options"></div>
-        <button onclick="closeModal()" style="background:none; border:none; color:#999; margin-top:10px;">إلغاء</button>
-    </div>
-</div>
-
-<div class="modal" id="cart-details-modal">
-    <div class="modal-content" style="max-width: 500px;">
-        <h3 style="color:var(--red)">تأكيد الطلب</h3>
-        <div id="cart-list" style="text-align:right; margin-bottom:15px; max-height:200px; overflow-y:auto;"></div>
-        <input type="text" id="custName" placeholder="الاسم">
-        <input type="text" id="custAddr" placeholder="العنوان بالتفصيل">
-        <button onclick="sendOrder()" style="background:#25d366; color:white; border:none; padding:12px; width:100%; border-radius:5px; font-weight:bold; margin-top:10px;">إرسال واتساب</button>
-        <button onclick="closeCart()" style="background:none; border:none; color:#999; margin-top:10px;">رجوع</button>
+        <button onclick="closeModal()">إلغاء</button>
     </div>
 </div>
 
 <script>
 const menuData = [
-    { title: "ساندوتشات (فينو - سوري - XL) 🌭", items: [
-        { name: "بطاطس", p: { "فينو": 15, "سوري": 20, "XL": 30 } },
-        { name: "كبدة اسكندراني", p: { "فينو": 20, "سوري": 30, "XL": 40 } },
-        { name: "جبنة مقلية", p: { "فينو": 20, "سوري": 25, "XL": 40 } },
-        { name: "بطاطس تشيز", p: { "فينو": 25, "سوري": 30, "XL": 40 } },
-        { name: "بطاطس رومي / موتزاريلا", p: { "فينو": 30, "سوري": 35, "XL": 40 } },
-        { name: "بانية / زنجر / كريسبي", p: { "فينو": 55, "سوري": 70, "XL": 80 } },
-        { name: "سجق اسكندراني", p: { "فينو": 50, "سوري": 60, "XL": 70 } },
-        { name: "كفتة لحم / فراخ", p: { "فينو": 60, "سوري": 70, "XL": 80 } },
-        { name: "شيش طاووق", p: { "فينو": 50, "سوري": 80, "XL": 80 } },
-        { name: "كوردن بلو / سوبر كرانشي", p: { "فينو": 70, "سوري": 80, "XL": 80 } },
-        { name: "جمبري كريسبي", p: { "فينو": 80, "سوري": 90, "XL": 90 } }
+    { title: "الوجبات والريزو (15 صنف)", items: [
+        { n: "فاميلي استريبس (12 قطعة)", p: { "وجبة": 350 } }, { n: "كريسبي استريبس (6 قطع)", p: { "وجبة": 200 } },
+        { n: "لايت استريبس (3 قطع)", p: { "وجبة": 120 } }, { n: "فاميلي اكسترا (18 قطعة)", p: { "وجبة": 430 } },
+        { n: "وجبة شيش طاووق", p: { "وجبة": 190 } }, { n: "فاميلي ميكس", p: { "وجبة": 330 } },
+        { n: "ميكس توستا", p: { "وجبة": 390 } }, { n: "وجبة كوردن بلو", p: { "وجبة": 190 } },
+        { n: "وجبة بانية (3 قطع)", p: { "وجبة": 120 } }, { n: "وجبة بانية (6 قطع)", p: { "وجبة": 190 } }, { n: "وجبة بانية (12 قطعة)", p: { "وجبة": 330 } },
+        { n: "ريزو كبدة", p: { "طبق": 70 } }, { n: "ريزو شاورما", p: { "طبق": 90 } }, { n: "ريزو زنجر", p: { "طبق": 90 } }, { n: "ريزو سي فود", p: { "طبق": 120 } }
     ]},
-    { title: "ركن البيتزا 🍕", items: [
-        { name: "مارجريتا", p: { "صغير": 75, "وسط": 85, "كبير": 100 } },
-        { name: "رومي / كيري", p: { "صغير": 85, "وسط": 90, "كبير": 100 } },
-        { name: "مشكل جبن", p: { "صغير": 85, "وسط": 95, "كبير": 110 } },
-        { name: "مفروم / سجق / سوسيس", p: { "صغير": 95, "وسط": 120, "كبير": 135 } },
-        { name: "بسطرمة / شاورما", p: { "صغير": 95, "وسط": 125, "كبير": 140 } },
-        { name: "تشيكن باربيكيو / رانش", p: { "صغير": 110, "وسط": 135, "كبير": 150 } },
-        { name: "زنجر / بانية", p: { "صغير": 95, "وسط": 120, "كبير": 140 } },
-        { name: "جمبري / سي فود", p: { "صغير": 105, "وسط": 140, "كبير": 170 } },
-        { name: "سوبر ستار / بركان", p: { "صغير": 100, "وسط": 120, "كبير": 145 } },
-        { name: "كواترو / تونا", p: { "صغير": 110, "وسط": 120, "كبير": 140 } }
+    { title: "الساندوتشات (25 صنف)", items: [
+        { n: "بطاطس", p: { "فينو": 15, "سوري": 20, "XL": 30 } }, { n: "كبدة", p: { "فينو": 20, "سوري": 30, "XL": 40 } },
+        { n: "جبنة مقلية", p: { "فينو": 20, "سوري": 25, "XL": 40 } }, { n: "بطاطس تشيز", p: { "فينو": 25, "سوري": 30, "XL": 40 } },
+        { n: "بطاطس رومي", p: { "فينو": 30, "سوري": 35, "XL": 40 } }, { n: "بطاطس موتزاريلا", p: { "فينو": 30, "سوري": 35, "XL": 40 } },
+        { n: "بانية", p: { "فينو": 55, "سوري": 70, "XL": 80 } }, { n: "زنجر", p: { "فينو": 55, "سوري": 70, "XL": 80 } },
+        { n: "كريسبي", p: { "فينو": 55, "سوري": 70, "XL": 80 } }, { n: "سجق اسكندراني", p: { "فينو": 50, "سوري": 60, "XL": 70 } },
+        { n: "شيش طاووق", p: { "فينو": 50, "سوري": 80, "XL": 80 } }, { n: "كوردن بلو", p: { "فينو": 70, "سوري": 80, "XL": 80 } },
+        { n: "كفتة لحم", p: { "فينو": 60, "سوري": 70, "XL": 80 } }, { n: "كفتة فراخ", p: { "فينو": 60, "سوري": 70, "XL": 80 } },
+        { n: "جمبري كريسبي", p: { "فينو": 80, "سوري": 90, "XL": 90 } }, { n: "سوبر كرانشي", p: { "فينو": 70, "سوري": 80, "XL": 80 } },
+        { n: "صاروخ مكس جبن", p: { "صاروخ": 80 } }, { n: "صاروخ زنجر", p: { "صاروخ": 110 } }, { n: "صاروخ بانية", p: { "صاروخ": 100 } },
+        { n: "صاروخ شاورما لحمة", p: { "صاروخ": 120 } }, { n: "صاروخ كفتة", p: { "صاروخ": 100 } }
     ]},
-    { title: "كريب حادق (عادي - كونو - سوبر) 🌯", items: [
-        { name: "بطاطس / بوم", p: { "عادي": 60, "كونو": 70, "سوبر": 100 } },
-        { name: "شيدر / كيري / مشكل جبن", p: { "عادي": 75, "كونو": 85, "سوبر": 125 } },
-        { name: "مفروم / سوسيس / سجق", p: { "عادي": 80, "كونو": 90, "سوبر": 125 } },
-        { name: "بسطرمة / مشكل لحوم", p: { "عادي": 100, "كونو": 110, "سوبر": 150 } },
-        { name: "بانية / كريسبي / زنجر", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
-        { name: "برجر / مكس فراخ", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
-        { name: "جمبري / سي فود", p: { "عادي": 120, "كونو": 135, "سوبر": 170 } }
+    { title: "ركن البرجر (16 صنف)", items: [
+        { n: "كلاسيك فراخ/لحم", p: { "ساندوتش": 70 } }, { n: "برجر تشيز", p: { "ساندوتش": 80 } }, { n: "تشيكن رانش", p: { "ساندوتش": 90 } },
+        { n: "فاير تاك", p: { "ساندوتش": 85 } }, { n: "برجر دليمار", p: { "ساندوتش": 100 } }, { n: "بيج فاير", p: { "ساندوتش": 85 } },
+        { n: "زنجر تركي", p: { "ساندوتش": 85 } }, { n: "دبل تشيز", p: { "دبل": 120 } }, { n: "دبل دليمار", p: { "دبل": 150 } },
+        { n: "دبل بيج فاير", p: { "دبل": 130 } }, { n: "كاوبوي زنجر", p: { "ساندوتش": 85 } }, { n: "زنجر بسطرمة", p: { "ساندوتش": 90 } },
+        { n: "برجر لافا / أمريكان", p: { "ساندوتش": 85 } }, { n: "تربل دليمار", p: { "تربل": 170 } }, { n: "سماتش برجر", p: { "ساندوتش": 70 } }, { n: "هولي مكس", p: { "ساندوتش": 90 } }
     ]},
-    { title: "ركن البرجر 🍔", items: [
-        { name: "كلاسيك فراخ/لحم", p: { "ساندوتش": 70 } },
-        { name: "برجر تشيز / فاير تاك", p: { "ساندوتش": 80 } },
-        { name: "تشيكن رانش / بيج فاير", p: { "ساندوتش": 90 } },
-        { name: "دبل دليمار", p: { "دبل": 150 } },
-        { name: "تربل دليمار", p: { "تربل": 170 } },
-        { name: "سماش برجر", p: { "ساندوتش": 70 } }
+    { title: "البيتزا والفطير (44 صنف)", items: [
+        { n: "مارجريتا", p: { "صغير": 75, "وسط": 85, "كبير": 100 } }, { n: "رومي / كيري", p: { "صغير": 85, "وسط": 90, "كبير": 100 } },
+        { n: "مشكل جبن", p: { "صغير": 85, "وسط": 95, "كبير": 110 } }, { n: "مفروم / سجق / سوسيس", p: { "صغير": 95, "وسط": 120, "كبير": 135 } },
+        { n: "بسطرمة / شاورما", p: { "صغير": 95, "وسط": 125, "كبير": 140 } }, { n: "تشيكن باربيكيو / رانش", p: { "صغير": 110, "وسط": 135, "كبير": 150 } },
+        { n: "زنجر / بانية / مكس فراخ", p: { "صغير": 95, "وسط": 120, "كبير": 140 } }, { n: "جمبري / سي فود", p: { "صغير": 105, "وسط": 140, "كبير": 170 } },
+        { n: "سوبر ستار / بركان", p: { "صغير": 100, "وسط": 120, "كبير": 145 } }, { n: "كواترو / تونا", p: { "صغير": 110, "وسط": 120, "كبير": 140 } },
+        { n: "فطير مشكل جبن", p: { "شرقي": 120, "ايطالي": 130 } }, { n: "فطير مشكل لحوم", p: { "شرقي": 150, "اسكندراني": 170 } },
+        { n: "فطير بسطرمة / سوسيس", p: { "شرقي": 130, "ايطالي": 140 } }, { n: "فطير شاورما / زنجر", p: { "شرقي": 150, "ايطالي": 160 } }
     ]},
-    { title: "الوجبات والريزو 🍱", items: [
-        { name: "فاميلي استريبس (12 ق)", p: { "وجبة": 350 } },
-        { name: "كريسبي استريبس (6 ق)", p: { "وجبة": 200 } },
-        { name: "ريزو شاورما / زنجر", p: { "طبق": 90 } },
-        { name: "وجبة شيش طاووق", p: { "وجبة": 190 } }
+    { title: "الكريب (حادق وحلو) (20 صنف)", items: [
+        { n: "بطاطس / بوم", p: { "عادي": 60, "كونو": 70, "سوبر": 100 } }, { n: "شيدر / كيري / مشكل جبن", p: { "عادي": 75, "كونو": 85, "سوبر": 125 } },
+        { n: "مفروم / سوسيس / سجق", p: { "عادي": 80, "كونو": 90, "سوبر": 125 } }, { n: "بسطرمة / مشكل لحوم", p: { "عادي": 100, "كونو": 110, "سوبر": 150 } },
+        { n: "بانية / كريسبي / زنجر", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } }, { n: "برجر / مكس فراخ", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
+        { n: "جمبري / سي فود", p: { "عادي": 120, "كونو": 135, "سوبر": 170 } }, { n: "كريب نوتيلا / لوتس", p: { "عادي": 80 } }, { n: "كريب نوتيلا موز", p: { "عادي": 90 } }
     ]},
-    { title: "فطير حادق وصاروخ 🥐🚀", items: [
-        { name: "صاروخ مكس جبن", p: { "صاروخ": 80 } },
-        { name: "صاروخ زنجر / بانية", p: { "صاروخ": 100 } },
-        { name: "فطير مشكل جبن", p: { "شرقي": 120 } },
-        { name: "فطير مشكل لحوم", p: { "شرقي": 150 } }
+    { title: "المكرونة والفتة والشاورما (23 صنف)", items: [
+        { n: "مكرونة فراخ / سجق", p: { "طبق": 80 } }, { n: "نجرسكو / الفريدو", p: { "طبق": 90 } }, { n: "مكرونة سي فود", p: { "طبق": 135 } },
+        { n: "فتة شاورما لحمة / فراخ", p: { "طبق": 130 } }, { n: "ماريا لحمة / فراخ", p: { "ساندوتش": 100 } }, { n: "بوكس عربي مكس", p: { "بوكس": 160 } }
     ]},
-    { title: "المكرونة 🍝", items: [
-        { name: "مكرونة فراخ / مفروم", p: { "طبق": 80 } },
-        { name: "نجرسكو / الفريدو", p: { "طبق": 90 } },
-        { name: "سي فود / جمبري", p: { "طبق": 135 } }
-    ]},
-    { title: "الحلويات 🍯", items: [
-        { name: "فطير كاستر / بغاشة", p: { "فطيرة": 50 } },
-        { name: "فطير نوتيلا / لوتس", p: { "فطيرة": 100 } },
-        { name: "كريب نوتيلا / لوتس", p: { "كريب": 80 } }
+    { title: "الفطير الحلو والإضافات (22 صنف)", items: [
+        { n: "فطير سكر ولبن / كاستر", p: { "فطيرة": 50 } }, { n: "فطير نوتيلا / لوتس", p: { "فطيرة": 100 } },
+        { n: "باكت فارم / تشيز", p: { "وسط": 30, "كبير": 35 } }, { n: "موتزاريلا استيكس", p: { "4 قطع": 40 } }
     ]}
 ];
 
 let cart = []; let total = 0;
-
 function init() {
     const container = document.getElementById('menu-content');
     menuData.forEach((section, sIdx) => {
         let html = `<div class="cat-btn" onclick="togg(${sIdx})">${section.title} <span>▼</span></div><div class="items-box" id="s-${sIdx}">`;
         section.items.forEach(item => {
-            html += `<div class="item-card"><div><b>${item.name}</b></div><button class="add-btn" onclick='openSizeModal("${item.name}", ${JSON.stringify(item.p)})'>+</button></div>`;
+            html += `<div class="item-card"><div><b>${item.n}</b></div><button class="add-btn" onclick='openSizeModal("${item.n}", ${JSON.stringify(item.p)})'>+</button></div>`;
         });
         container.innerHTML += html + `</div>`;
     });
 }
-
 function togg(i) { document.getElementById(`s-${i}`).classList.toggle('active'); }
 function openSizeModal(name, prices) {
     const optionsDiv = document.getElementById('size-options');
@@ -151,17 +119,7 @@ function add(n, s, p) {
     document.getElementById('total-val').innerText = total;
     closeModal();
 }
-function showCart() {
-    document.getElementById('cart-list').innerHTML = cart.map(i => `<div>• ${i.n} - ${i.p}ج</div>`).join('');
-    document.getElementById('cart-details-modal').style.display = 'flex';
-}
-function closeCart() { document.getElementById('cart-details-modal').style.display = 'none'; }
-function sendOrder() {
-    const name = document.getElementById('custName').value;
-    const addr = document.getElementById('custAddr').value;
-    if(!name || !addr) return alert("اكمل البيانات");
-    window.open(`https://wa.me/201030353060?text=طلب جديد من ${name}%0Aالعنوان: ${addr}%0A${cart.map(i=>i.n).join('%0A')}%0Aالاجمالي: ${total}`);
-}
+function showCart() { alert("تم حفظ الطلبات في السلة، جاهزة للإرسال."); }
 init();
 </script>
 </body>
