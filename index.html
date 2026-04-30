@@ -11,25 +11,16 @@
         header { text-align: center; padding: 15px; border-bottom: 2px solid var(--red); background: #000; }
         .logo { width: 65px; border-radius: 50%; border: 1px solid var(--red); }
         .container { max-width: 600px; margin: auto; padding: 10px; }
-        
         .cat-btn { background: #1a1a1a; color: #fff; padding: 12px; border-radius: 8px; margin-top: 8px; cursor: pointer; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .items-box { display: none; margin-top: 5px; }
         .items-box.active { display: block; }
-
-        .item-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 6px; border-right: 4px solid var(--red); }
-        .item-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        
-        /* حل مشكلة الأحجام */
-        .size-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .size-btn { background: #222; border: 1px solid #444; color: #ccc; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; flex-grow: 1; text-align: center; }
-        .size-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .size-btn span { display: block; font-size: 0.7rem; color: var(--gold); }
-
-        #cart-bar { position: fixed; bottom: 0; width: 100%; background: var(--red); color: #fff; padding: 12px 0; text-align: center; font-weight: bold; font-size: 0.95rem; cursor: pointer; z-index: 500; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #333; background: #111; color: #fff; font-family: 'Cairo'; box-sizing: border-box; }
-        .btn-order { width: 100%; background: #25d366; color: #fff; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .item-card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 6px; border-right: 4px solid var(--red); display: flex; justify-content: space-between; align-items: center; }
+        .add-btn { background: var(--red); color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #cart-bar { position: fixed; bottom: 0; width: 100%; background: var(--red); color: #fff; padding: 12px 0; text-align: center; font-weight: bold; z-index: 500; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 10px; width: 85%; max-width: 400px; text-align: center; border: 1px solid var(--red); }
+        .size-opt { background: #333; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: pointer; display: flex; justify-content: space-between; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none; }
     </style>
 </head>
 <body>
@@ -41,79 +32,93 @@
 
 <div class="container" id="menu-content"></div>
 
-<div id="cart-bar" onclick="showCart()">🛒 السلة (<span id="total-val">0</span> ج)</div>
+<div id="cart-bar" onclick="showCart()">🛒 عرض الطلب (<span id="total-val">0</span> ج)</div>
 
-<div class="modal" id="cart-modal">
-    <h3 style="color:var(--red)">تفاصيل الطلب</h3>
-    <div id="cart-items" style="margin-bottom:20px;"></div>
-    <input type="text" id="userName" placeholder="الاسم">
-    <input type="text" id="userAddr" placeholder="العنوان بالتفصيل">
-    <button class="btn-order" onclick="sendWhatsApp()">تأكيد وإرسال واتساب</button>
-    <button onclick="hideCart()" style="width:100%; background:none; border:none; color:#666; margin-top:15px; font-family:'Cairo';">رجوع للمنيو</button>
+<div class="modal" id="size-modal">
+    <div class="modal-content">
+        <h3 id="modal-title" style="color:var(--gold)">اختر الحجم</h3>
+        <div id="size-options"></div>
+        <button onclick="closeModal()" style="background:none; border:none; color:#999; margin-top:10px;">إلغاء</button>
+    </div>
+</div>
+
+<div class="modal" id="cart-details-modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="color:var(--red)">تأكيد الطلب</h3>
+        <div id="cart-list" style="text-align:right; margin-bottom:15px; max-height:200px; overflow-y:auto;"></div>
+        <input type="text" id="custName" placeholder="الاسم">
+        <input type="text" id="custAddr" placeholder="العنوان بالتفصيل">
+        <button onclick="sendOrder()" style="background:#25d366; color:white; border:none; padding:12px; width:100%; border-radius:5px; font-weight:bold; margin-top:10px;">إرسال واتساب</button>
+        <button onclick="closeCart()" style="background:none; border:none; color:#999; margin-top:10px;">رجوع</button>
+    </div>
 </div>
 
 <script>
-// المنيو الكامل المستخرج من الصور
 const menuData = [
     { title: "ساندوتشات (فينو - سوري - XL) 🌭", items: [
         { name: "بطاطس", p: { "فينو": 15, "سوري": 20, "XL": 30 } },
         { name: "كبدة اسكندراني", p: { "فينو": 20, "سوري": 30, "XL": 40 } },
         { name: "جبنة مقلية", p: { "فينو": 20, "سوري": 25, "XL": 40 } },
+        { name: "بطاطس تشيز", p: { "فينو": 25, "سوري": 30, "XL": 40 } },
+        { name: "بطاطس رومي / موتزاريلا", p: { "فينو": 30, "سوري": 35, "XL": 40 } },
         { name: "بانية / زنجر / كريسبي", p: { "فينو": 55, "سوري": 70, "XL": 80 } },
+        { name: "سجق اسكندراني", p: { "فينو": 50, "سوري": 60, "XL": 70 } },
+        { name: "كفتة لحم / فراخ", p: { "فينو": 60, "سوري": 70, "XL": 80 } },
         { name: "شيش طاووق", p: { "فينو": 50, "سوري": 80, "XL": 80 } },
-        { name: "سجق اسكندراني", p: { "فينو": 50, "سوري": 60, "XL": 70 } }
+        { name: "كوردن بلو / سوبر كرانشي", p: { "فينو": 70, "سوري": 80, "XL": 80 } },
+        { name: "جمبري كريسبي", p: { "فينو": 80, "سوري": 90, "XL": 90 } }
     ]},
     { title: "ركن البيتزا 🍕", items: [
         { name: "مارجريتا", p: { "صغير": 75, "وسط": 85, "كبير": 100 } },
+        { name: "رومي / كيري", p: { "صغير": 85, "وسط": 90, "كبير": 100 } },
         { name: "مشكل جبن", p: { "صغير": 85, "وسط": 95, "كبير": 110 } },
-        { name: "شاورما فراخ / لحمة", p: { "صغير": 95, "وسط": 125, "كبير": 140 } },
-        { name: "تشيكن رانش / باربيكيو", p: { "صغير": 110, "وسط": 135, "كبير": 150 } },
-        { name: "سي فود / جمبري", p: { "صغير": 105, "وسط": 140, "كبير": 170 } },
-        { name: "بيتزا توستا (كينج)", p: { "صغير": 100, "وسط": 130, "كبير": 150 } }
+        { name: "مفروم / سجق / سوسيس", p: { "صغير": 95, "وسط": 120, "كبير": 135 } },
+        { name: "بسطرمة / شاورما", p: { "صغير": 95, "وسط": 125, "كبير": 140 } },
+        { name: "تشيكن باربيكيو / رانش", p: { "صغير": 110, "وسط": 135, "كبير": 150 } },
+        { name: "زنجر / بانية", p: { "صغير": 95, "وسط": 120, "كبير": 140 } },
+        { name: "جمبري / سي فود", p: { "صغير": 105, "وسط": 140, "كبير": 170 } },
+        { name: "سوبر ستار / بركان", p: { "صغير": 100, "وسط": 120, "كبير": 145 } },
+        { name: "كواترو / تونا", p: { "صغير": 110, "وسط": 120, "كبير": 140 } }
     ]},
     { title: "كريب حادق (عادي - كونو - سوبر) 🌯", items: [
         { name: "بطاطس / بوم", p: { "عادي": 60, "كونو": 70, "سوبر": 100 } },
-        { name: "شيدر / كيري / مكس جبن", p: { "عادي": 65, "كونو": 75, "سوبر": 110 } },
-        { name: "بانية / زنجر / كريسبي", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
-        { name: "مكس فراخ توستا", p: { "عادي": 90, "كونو": 100, "سوبر": 150 } },
-        { name: "سي فود / جمبري", p: { "عادي": 120, "كونو": 135, "سوبر": 170 } }
+        { name: "شيدر / كيري / مشكل جبن", p: { "عادي": 75, "كونو": 85, "سوبر": 125 } },
+        { name: "مفروم / سوسيس / سجق", p: { "عادي": 80, "كونو": 90, "سوبر": 125 } },
+        { name: "بسطرمة / مشكل لحوم", p: { "عادي": 100, "كونو": 110, "سوبر": 150 } },
+        { name: "بانية / كريسبي / زنجر", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
+        { name: "برجر / مكس فراخ", p: { "عادي": 85, "كونو": 95, "سوبر": 150 } },
+        { name: "جمبري / سي فود", p: { "عادي": 120, "كونو": 135, "سوبر": 170 } }
     ]},
-    { title: "ركن البرجر (فراخ / لحم) 🍔", items: [
-        { name: "كلاسيك", p: { "ساندوتش": 70 } },
+    { title: "ركن البرجر 🍔", items: [
+        { name: "كلاسيك فراخ/لحم", p: { "ساندوتش": 70 } },
         { name: "برجر تشيز / فاير تاك", p: { "ساندوتش": 80 } },
-        { name: "برجر دليمار / تشيكن رانش", p: { "ساندوتش": 90 } },
-        { name: "دبل دليمار / تربل دليمار", p: { "دبل": 150, "تربل": 170 } }
+        { name: "تشيكن رانش / بيج فاير", p: { "ساندوتش": 90 } },
+        { name: "دبل دليمار", p: { "دبل": 150 } },
+        { name: "تربل دليمار", p: { "تربل": 170 } },
+        { name: "سماش برجر", p: { "ساندوتش": 70 } }
     ]},
-    { title: "ركن الوجبات والريزو 🍱", items: [
-        { name: "فاميلي استريبس (12 قطعة)", p: { "وجبة": 350 } },
-        { name: "كريسبي استريبس (6 قطع)", p: { "وجبة": 200 } },
-        { name: "ريزو (كبدة/شاورما/زنجر)", p: { "عادي": 70, "مكس": 90 } },
-        { name: "وجبة شيش طاووق (9 قطع)", p: { "وجبة": 190 } }
+    { title: "الوجبات والريزو 🍱", items: [
+        { name: "فاميلي استريبس (12 ق)", p: { "وجبة": 350 } },
+        { name: "كريسبي استريبس (6 ق)", p: { "وجبة": 200 } },
+        { name: "ريزو شاورما / زنجر", p: { "طبق": 90 } },
+        { name: "وجبة شيش طاووق", p: { "وجبة": 190 } }
     ]},
-    { title: "ركن المكرونة 🍝", items: [
-        { name: "مكرونة فراخ / مفروم", p: { "أبيض": 80, "أحمر": 80 } },
+    { title: "فطير حادق وصاروخ 🥐🚀", items: [
+        { name: "صاروخ مكس جبن", p: { "صاروخ": 80 } },
+        { name: "صاروخ زنجر / بانية", p: { "صاروخ": 100 } },
+        { name: "فطير مشكل جبن", p: { "شرقي": 120 } },
+        { name: "فطير مشكل لحوم", p: { "شرقي": 150 } }
+    ]},
+    { title: "المكرونة 🍝", items: [
+        { name: "مكرونة فراخ / مفروم", p: { "طبق": 80 } },
         { name: "نجرسكو / الفريدو", p: { "طبق": 90 } },
         { name: "سي فود / جمبري", p: { "طبق": 135 } }
     ]},
-    { title: "ركن الفطير الحادق 🥐", items: [
-        { name: "موتزاريلا / رومي / كيري", p: { "شرقي": 110, "اسكندراني": 120 } },
-        { name: "مشكل لحوم / بسطرمة", p: { "شرقي": 150, "اسكندراني": 170 } },
-        { name: "فطيرة توستا / الكينج", p: { "وسط": 150, "كبير": 160 } }
-    ]},
-    { title: "ساندوتشات الصاروووخ 🚀", items: [
-        { name: "صاروخ مكس جبن", p: { "قطعة": 80 } },
-        { name: "صاروخ زنجر / مكس فراخ", p: { "قطعة": 110 } },
-        { name: "صاروخ شاورما لحمة", p: { "قطعة": 120 } }
-    ]},
-    { title: "الحلويات (فطير وكريب) 🍯", items: [
-        { name: "سكر ولبن / كاستر", p: { "فطيرة": 50 } },
-        { name: "شوكولاتة / نوتيلا", p: { "فطيرة": 80, "كريب": 80 } },
-        { name: "لوتس / مكس توستا", p: { "فطيرة": 120, "كريب": 100 } }
-    ]},
-    { title: "إضافات 🍟", items: [
-        { name: "باكت فارم / تشيز", p: { "وسط": 30, "كبير": 35 } },
-        { name: "كول سلو / صوصات", p: { "علبة": 15 } }
-    ] }
+    { title: "الحلويات 🍯", items: [
+        { name: "فطير كاستر / بغاشة", p: { "فطيرة": 50 } },
+        { name: "فطير نوتيلا / لوتس", p: { "فطيرة": 100 } },
+        { name: "كريب نوتيلا / لوتس", p: { "كريب": 80 } }
+    ]}
 ];
 
 let cart = []; let total = 0;
@@ -121,40 +126,41 @@ let cart = []; let total = 0;
 function init() {
     const container = document.getElementById('menu-content');
     menuData.forEach((section, sIdx) => {
-        let sectionHtml = `<div class="cat-btn" onclick="togg(${sIdx})">${section.title} <span>▼</span></div><div class="items-box" id="s-${sIdx}">`;
+        let html = `<div class="cat-btn" onclick="togg(${sIdx})">${section.title} <span>▼</span></div><div class="items-box" id="s-${sIdx}">`;
         section.items.forEach(item => {
-            sectionHtml += `<div class="item-card"><div class="item-info"><b>${item.name}</b></div><div class="size-row">`;
-            for (let size in item.p) {
-                sectionHtml += `<button class="size-btn" onclick="addToCart('${item.name}', '${size}', ${item.p[size]})"><span>${size}</span>${item.p[size]}ج</button>`;
-            }
-            sectionHtml += `</div></div>`;
+            html += `<div class="item-card"><div><b>${item.name}</b></div><button class="add-btn" onclick='openSizeModal("${item.name}", ${JSON.stringify(item.p)})'>+</button></div>`;
         });
-        container.innerHTML += sectionHtml + `</div>`;
+        container.innerHTML += html + `</div>`;
     });
 }
 
 function togg(i) { document.getElementById(`s-${i}`).classList.toggle('active'); }
-
-function addToCart(n, s, p) {
-    cart.push({ full: `${n} - ${s}`, price: p });
+function openSizeModal(name, prices) {
+    const optionsDiv = document.getElementById('size-options');
+    document.getElementById('modal-title').innerText = name;
+    optionsDiv.innerHTML = '';
+    for (let s in prices) {
+        optionsDiv.innerHTML += `<div class="size-opt" onclick="add('${name}', '${s}', ${prices[s]})"><span>${s}</span><span>${prices[s]} ج</span></div>`;
+    }
+    document.getElementById('size-modal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('size-modal').style.display = 'none'; }
+function add(n, s, p) {
+    cart.push({ n: `${n} (${s})`, p });
     total += p;
     document.getElementById('total-val').innerText = total;
+    closeModal();
 }
-
 function showCart() {
-    if(cart.length === 0) return alert("السلة فارغة");
-    document.getElementById('cart-modal').style.display = 'block';
-    document.getElementById('cart-items').innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.full}</span><span>${i.price} ج</span></div>`).join('');
+    document.getElementById('cart-list').innerHTML = cart.map(i => `<div>• ${i.n} - ${i.p}ج</div>`).join('');
+    document.getElementById('cart-details-modal').style.display = 'flex';
 }
-
-function hideCart() { document.getElementById('cart-modal').style.display = 'none'; }
-
-function sendWhatsApp() {
-    let name = document.getElementById('userName').value;
-    let addr = document.getElementById('userAddr').value;
-    if(!name || !addr) return alert("اكتب الاسم والعنوان");
-    let msg = `*طلب جديد من توستا*%0A*الاسم:* ${name}%0A*العنوان:* ${addr}%0A*الطلبات:*%0A${cart.map(i=> "- " + i.full).join('%0A')}%0A*الإجمالي:* ${total} ج`;
-    window.open(`https://wa.me/201030353060?text=${msg}`);
+function closeCart() { document.getElementById('cart-details-modal').style.display = 'none'; }
+function sendOrder() {
+    const name = document.getElementById('custName').value;
+    const addr = document.getElementById('custAddr').value;
+    if(!name || !addr) return alert("اكمل البيانات");
+    window.open(`https://wa.me/201030353060?text=طلب جديد من ${name}%0Aالعنوان: ${addr}%0A${cart.map(i=>i.n).join('%0A')}%0Aالاجمالي: ${total}`);
 }
 init();
 </script>
