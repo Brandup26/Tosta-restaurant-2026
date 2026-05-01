@@ -26,21 +26,21 @@
         
         .price-card { background: #1a1a1a; border: 1px solid #333; border-radius: 1.2rem; overflow: hidden; position: relative; padding: 15px; margin-bottom: 15px; }
         
-        /* تصميم الوجبات المنظم */
-        .meal-card { background: #161616; border: 1px solid #27272a; border-radius: 1.2rem; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .meal-info { display: flex; flex-direction: column; gap: 4px; }
+        /* وجبات بتصميم منظم واحترافي */
+        .meal-card { background: #161616; border: 1px solid #222; border-radius: 1.2rem; padding: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .meal-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .meal-name { font-weight: 900; font-size: 1.1rem; color: #fff; }
+        .meal-desc { font-size: 0.75rem; color: #71717a; line-height: 1.4; }
         
         /* زر شراء أصغر وأشيك */
-        .meal-price-btn { background: #ff3131; color: white; padding: 6px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; text-align: center; min-width: 70px; }
+        .meal-price-btn { background: #ff3131; color: white; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; min-width: 70px; border: none; align-self: center; }
         .meal-price-btn:active { scale: 0.92; }
-        .meal-price-btn span { display: block; line-height: 1.2; }
 
         .plus-icon { position: absolute; top: 0; right: 0; background: #ff3131; color: white; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border-radius: 0 0 0 10px; }
         .logo-container img { max-width: 100px; margin: 0 auto 8px; display: block; border-radius: 15px; }
         .input-field { width: 100%; border: 1px solid #27272a; padding: 16px; border-radius: 15px; color: white; outline: none; background: #000; text-align: right; }
         .input-field:focus { border-color: #ff3131; }
         .designer-box { margin-top: 50px; padding: 30px 20px; border-top: 1px solid #27272a; text-align: center; color: #71717a; font-size: 13px; background: #050505; }
-        .designer-box a { color: #ff3131; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -65,8 +65,7 @@
 
     <div class="designer-box">
         <p dir="ltr">Designed by Eng / <span class="text-white">Anas Gaber Shehata</span></p>
-        <p class="mt-2" dir="ltr">📞 <a href="tel:01003800314">01003800314</a></p>
-        <p class="mt-4 text-[10px]">جميع الحقوق محفوظة لمطعم توستا © 2026</p>
+        <p class="mt-2" dir="ltr">📞 <a href="tel:01003800314" style="color:#ff3131">01003800314</a></p>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 z-[150] hidden bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
@@ -88,7 +87,7 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered"));
+            navigator.serviceWorker.register('sw.js');
         }
 
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
@@ -108,7 +107,13 @@
                 rows.forEach((row, index) => {
                     if (index === 0) return;
                     const cat = row.c[0]?.v || "أخرى";
-                    const item = { category: cat, name: row.c[1]?.v || "", prices: [row.c[2]?.v, row.c[3]?.v, row.c[4]?.v] };
+                    // أخذنا السعر والمحتوى من الأعمدة المتاحة
+                    const item = { 
+                        category: cat, 
+                        name: row.c[1]?.v || "", 
+                        prices: [row.c[2]?.v, row.c[3]?.v, row.c[4]?.v],
+                        desc: row.c[5]?.v || "أجمد وجبة من توستا 🔥" // لو في عمود سادس للوصف
+                    };
                     if (!menuData[cat]) menuData[cat] = [];
                     menuData[cat].push(item);
                 });
@@ -129,7 +134,7 @@
                     btn.classList.add('active');
                     renderCategory(cat);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                 };
                 nav.appendChild(btn);
             });
@@ -141,31 +146,34 @@
             
             let isMeal = catName.includes("وجبات") || catName.includes("الوجبات");
             let labels = ["السعر", "وسط", "كبير"];
-            
+            if (catName.includes("مكرونة")) labels = ["أبيض", "أحمر", ""];
+            else if (catName.includes("شاورما")) labels = ["فينو", "سوري", "XL"];
+            else if (catName.includes("برجر")) labels = ["فراخ", "لحمة", "دبل"];
+            else if (catName.includes("بيتزا")) labels = ["صغير", "وسط", "كبير"];
+
             menuData[catName].forEach(item => {
                 if (isMeal) {
                     let price = item.prices[0];
-                    // فحص السعر: لا يظهر الزر إذا كان السعر 0 أو غير موجود
-                    let priceHtml = (price && price > 0) ? `
-                        <div onclick="addToCart('${item.category}', '${item.name}', ${price})" class="meal-price-btn">
-                            <span class="text-[10px] opacity-80">إضافة</span>
-                            <span class="text-sm font-black">${price}ج</span>
-                        </div>` : `<span class="text-zinc-600 text-xs italic">غير متوفر</span>`;
-
-                    container.innerHTML += `
-                        <div class="meal-card">
-                            <div class="meal-info">
-                                <h3 class="font-bold text-white text-[15px]">${item.name}</h3>
-                                <p class="text-zinc-500 text-[11px]">أجمد وجبة من توستا 🔥</p>
-                            </div>
-                            ${priceHtml}
-                        </div>`;
+                    // إخفاء الوجبة لو السعر صفر أو غير موجود
+                    if (price && price > 0) {
+                        container.innerHTML += `
+                            <div class="meal-card">
+                                <div class="meal-info">
+                                    <span class="meal-name">${item.name}</span>
+                                    <p class="meal-desc">${item.desc}</p>
+                                </div>
+                                <div onclick="addToCart('${item.category}', '${item.name}', ${price})" class="meal-price-btn">
+                                    <span style="font-size:10px; opacity:0.8">إضافة</span>
+                                    <span>${price}ج</span>
+                                </div>
+                            </div>`;
+                    }
                 } else {
                     let html = `<div class="price-card"><h3 class="font-bold text-zinc-100 mb-4 text-right">${item.name}</h3><div class="flex gap-2">`;
                     item.prices.forEach((p, i) => {
                         if (p && p > 0) {
-                            html += `<div onclick="addToCart('${item.category}', '${item.name} (${labels[i] || 'السعر'})', ${p})" class="flex-1 bg-zinc-800/60 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-600/30">
-                                <span class="block text-[10px] text-zinc-400 mb-1">${labels[i] || 'السعر'}</span>
+                            html += `<div onclick="addToCart('${item.category}', '${item.name} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/60 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-600/30">
+                                <span class="block text-[10px] text-zinc-400 mb-1">${labels[i]}</span>
                                 <span class="text-white font-bold">${p}ج</span>
                                 <div class="plus-icon">+</div>
                             </div>`;
@@ -191,7 +199,6 @@
                 total += item.price * item.qty;
                 let cleanCat = item.cat.replace("ركن ", "").replace("قسم ", "").trim();
                 let cleanName = item.name.replace(cleanCat, "").trim();
-                
                 list.innerHTML += `<div class="flex justify-between items-center bg-black p-4 rounded-xl border border-zinc-800 text-right">
                     <button onclick="removeFromCart(${index})" class="text-red-500 font-bold px-3">حذف</button>
                     <div>
@@ -211,4 +218,22 @@
         function closeCart() { document.getElementById('checkout-modal').classList.add('hidden'); }
 
         function sendToWhatsApp() {
-            const name = document.getElementById('user-
+            const name = document.getElementById('user-name').value.trim();
+            const phone = document.getElementById('user-phone').value.trim();
+            const addr = document.getElementById('user-address').value.trim();
+            if (!name || !phone || !addr) return alert("أكمل بيانات التوصيل أولاً!");
+            let msg = `*طلب جديد من مطعم توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${addr}\n\n🛒 *الطلبات:*\n`;
+            let total = 0;
+            cart.forEach(i => {
+                let cleanCat = i.cat.replace("ركن ", "").replace("قسم ", "").trim();
+                let cleanName = i.name.replace(cleanCat, "").trim();
+                msg += `• ${cleanCat} ${cleanName} (عدد ${i.qty}) = ${i.qty * i.price}ج\n`;
+                total += i.qty * i.price;
+            });
+            msg += `\n💰 *الإجمالي النهائي:* ${total} جنيه`;
+            window.open(`https://wa.me/${restaurantPhone}?text=${encodeURIComponent(msg)}`);
+        }
+        window.onload = fetchMenu;
+    </script>
+</body>
+</html>
