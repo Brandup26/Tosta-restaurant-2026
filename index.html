@@ -118,7 +118,7 @@
             let labels = ["السعر", "وسط", "كبير"]; 
             
             if (catName.includes("المكرونة")) {
-                labels = ["أبيض", "أحمر", ""]; // مكرونة أبيض وأحمر فقط
+                labels = ["أبيض", "أحمر", ""]; // تم التعديل هنا: أبيض وأحمر فقط
             } else if (catName.includes("شاورما عربي")) {
                 labels = ["السعر", "", ""];
             } else if (catName.includes("شاورما")) {
@@ -208,7 +208,6 @@
             
             let total = 0;
             cart.forEach(i => {
-                // إضافة اسم القسم جنب الطلب في رسالة الواتساب
                 msg += `• ${i.name} [${i.cat}] (عدد ${i.qty}) = ${i.qty * i.price}ج\n`;
                 total += i.qty * i.price;
             });
