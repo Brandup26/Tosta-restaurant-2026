@@ -1,0 +1,21 @@
+{
+  "name": "مطعم توستا - الأكل بشكل تاني",
+  "short_name": "Tosta",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0c0c0c",
+  "theme_color": "#ff3131",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Tosta.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "Tosta.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
