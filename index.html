@@ -10,8 +10,7 @@
         body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 50px; }
         .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; }
         .category-tab.active { background-color: #ff3131; color: white; border-color: #ff3131; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
-        .price-card { background: #1a1a1a; border: 1px solid #333; transition: transform 0.2s; }
-        .price-card:active { transform: scale(0.98); }
+        .price-card { background: #1a1a1a; border: 1px solid #333; }
         .horizontal-scroll { -ms-overflow-style: none; scrollbar-width: none; overflow-x: auto; display: flex; }
         .horizontal-scroll::-webkit-scrollbar { display: none; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #ff3131; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
@@ -22,7 +21,7 @@
 
     <header class="text-center py-8 bg-black border-b border-zinc-800">
         <h1 class="text-5xl font-bold text-red-600 tracking-tighter" style="text-shadow: 0 0 10px rgba(255,0,0,0.5);">TOSTA</h1>
-        <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">The Best Food Experience</p>
+        <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">طعم الجودة في كل لقمة</p>
     </header>
 
     <nav id="category-nav" class="horizontal-scroll sticky top-0 z-50 bg-black/95 backdrop-blur-md py-4 px-4 gap-3 border-b border-white/10">
@@ -62,7 +61,7 @@
                 renderCategory(Object.keys(menuData)[0]);
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById('menu-container').innerHTML = "خطأ في تحميل المنيو. تأكد من إعدادات المشاركة في الشيت.";
+                document.getElementById('menu-container').innerHTML = "خطأ في تحميل المنيو. تأكد من إعدادات المشاركة.";
             }
         }
 
@@ -87,13 +86,16 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full"></span> ${catName}</h2>`;
             
-            // تخصيص العناوين ديناميكياً
+            // تخصيص المسميات حسب القسم بناءً على ملاحظاتك
             let label1 = "فينو"; let label2 = "سوري"; let label3 = "XL";
 
             if (catName.includes("مكرونة")) { label1 = "أبيض"; label2 = "أحمر"; label3 = ""; }
+            else if (catName.includes("برجر")) { label1 = "فراخ"; label2 = "لحمة"; label3 = ""; }
             else if (catName.includes("بيتزا") || catName.includes("فطير")) { label1 = "وسط"; label2 = "كبير"; label3 = "صاروخ"; }
             else if (catName.includes("كريب حادق")) { label1 = "عادي"; label2 = "كونو"; label3 = "سوبر"; }
-            else if (catName.includes("وجبات") || catName.includes("حلو") || catName.includes("ريزو") || catName.includes("فتة")) { label1 = "السعر"; label2 = ""; label3 = ""; }
+            else if (catName.includes("إضافات") || catName.includes("وجبات") || catName.includes("حلو") || catName.includes("ريزو") || catName.includes("فتة") || catName.includes("ماريا")) { 
+                label1 = "السعر"; label2 = ""; label3 = ""; 
+            }
 
             menuData[catName].forEach(item => {
                 const itemHtml = `
