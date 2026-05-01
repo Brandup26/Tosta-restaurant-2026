@@ -7,12 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; overflow-x: hidden; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; overflow-x: hidden; scroll-behavior: smooth; }
         
-        .header-wrapper { position: sticky; top: 0; z-index: 100; background-color: black; }
-        /* تكبير الهيدر قليلاً */
-        .sticky-header { border-bottom: 1px solid #27272a; padding: 25px 0; text-align: center; }
-        .sticky-nav { background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
+        /* تثبيت الهيدر والأقسام */
+        .header-wrapper { position: sticky; top: 0; z-index: 100; background-color: black; border-bottom: 1px solid #27272a; }
+        .sticky-header { padding: 25px 0; text-align: center; }
+        .sticky-nav { background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); padding: 15px 0; }
 
         .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; border: 1px solid #3f3f46; border-radius: 12px; padding: 10px 22px; font-size: 14px; font-weight: bold; background: #000; color: #a1a1aa; }
         .category-tab.active { background-color: #ff3131; color: white; border-color: #ff3131; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
@@ -25,16 +25,17 @@
         
         .logo-container img { max-width: 100px; margin: 0 auto 8px; display: block; border-radius: 15px; }
         
-        /* استعادة شكل الخانات القديم */
-        .input-field { width: 100%; bg-black; border: 1px solid #27272a; padding: 16px; border-radius: 15px; color: white; outline: none; background: #000; text-align: right; }
+        /* خانات البيانات */
+        .input-field { width: 100%; border: 1px solid #27272a; padding: 16px; border-radius: 15px; color: white; outline: none; background: #000; text-align: right; }
         .input-field:focus { border-color: #ff3131; }
 
-        .designer-box { margin-top: 40px; padding: 20px; border-top: 1px solid #27272a; text-align: center; color: #555; font-size: 12px; }
+        .designer-box { margin-top: 50px; padding: 30px 20px; border-top: 1px solid #27272a; text-align: center; color: #71717a; font-size: 13px; background: #050505; }
+        .designer-box a { color: #ff3131; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header-wrapper">
+    <div class="header-wrapper" id="top-anchor">
         <header class="sticky-header">
             <div class="logo-container">
                 <img src="Tosta.jpg" alt="Tosta Logo" onerror="this.style.display='none'">
@@ -54,8 +55,9 @@
     <main id="menu-container" class="container mx-auto px-4 py-6 max-w-md"></main>
 
     <div class="designer-box">
-        <p>تصميم وتطوير المهندس محمد</p>
-        <p class="mt-1">جميع الحقوق محفوظة لمطعم توستا © 2026</p>
+        <p dir="ltr">Designed by Eng / <span class="text-white">Anas Gaber Shehata</span></p>
+        <p class="mt-2" dir="ltr">📞 <a href="tel:01003800314">01003800314</a></p>
+        <p class="mt-4 text-[10px]">جميع الحقوق محفوظة لمطعم توستا © 2026</p>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 z-[150] hidden bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
@@ -115,7 +117,12 @@
                     document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderCategory(cat);
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    
+                    // إصلاح مشكلة الـ Scroll: الصعود لأعلى القائمة
+                    const headerOffset = document.getElementById('top-anchor').offsetHeight;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 };
                 nav.appendChild(btn);
             });
@@ -162,7 +169,6 @@
             list.innerHTML = ""; let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
-                // حذف كلمة "ركن" أو "قسم" من اسم الفئة عند العرض
                 let cleanCat = item.cat.replace("ركن ", "").replace("قسم ", "");
                 list.innerHTML += `<div class="flex justify-between items-center bg-black p-4 rounded-xl border border-zinc-800 text-right">
                     <button onclick="removeFromCart(${index})" class="text-red-500 font-bold px-3">حذف</button>
