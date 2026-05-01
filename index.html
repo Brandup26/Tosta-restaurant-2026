@@ -29,28 +29,9 @@
 
     <main id="menu-container" class="container mx-auto px-4 py-8 max-w-md"></main>
 
-    <div id="checkout-modal" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-sm p-4 overflow-y-auto text-right">
-        <div class="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-6 mt-10 border border-zinc-700">
-            <h2 class="text-2xl font-bold mb-4 text-red-500 text-center">تأكيد طلبك</h2>
-            <div id="cart-items-list" class="mb-6 space-y-3"></div>
-            <div id="total-price-display" class="text-center font-bold text-xl mb-6 bg-zinc-800 py-3 rounded-xl"></div>
-            <div class="space-y-4">
-                <input type="text" id="user-name" placeholder="الاسم بالكامل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none focus:border-red-600">
-                <input type="tel" id="user-phone" placeholder="رقم الموبايل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none focus:border-red-600">
-                <textarea id="user-address" placeholder="العنوان بالتفصيل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none h-24 focus:border-red-600"></textarea>
-            </div>
-            <div class="mt-8 flex gap-3">
-                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-600 font-bold py-4 rounded-xl">إرسال للواتساب</button>
-                <button onclick="closeCart()" class="px-6 bg-zinc-800 text-zinc-400 rounded-xl">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
-        const restaurantPhone = "201014163994";
-        // إضافة timestamp لإجبار المتصفح على تحميل البيانات الجديدة من الشيت
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&t=${Date.now()}`;
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&cache_bust=${Date.now()}`;
 
         let menuData = {};
         let cart = [];
@@ -76,7 +57,7 @@
 
                 renderNav();
                 renderCategory(Object.keys(menuData)[0]);
-            } catch (e) { console.error("Data Error:", e); }
+            } catch (e) { console.error("Error:", e); }
         }
 
         function renderNav() {
@@ -99,23 +80,21 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500">• ${catName}</h2>`;
             
-            // تحديد المسميات بناءً على القسم
+            // تحديد أسماء الأحجام بشكل ذكي
             let labels = ["صغير", "وسط", "كبير"];
-            if (catName.includes("برجر")) labels = ["فراخ", "لحمة", ""];
-            else if (catName.includes("شاورما")) labels = ["فينو", "سوري", "XL"];
-            else if (catName.includes("كريب")) labels = ["عادي", "كونو", "سوبر"];
+            if (catName.includes("شاورما")) labels = ["فينو", "سوري", "XL"];
+            if (catName.includes("برجر")) labels = ["فراخ", "لحمة", "دبل"];
 
             menuData[catName].forEach(item => {
                 let html = `<div class="price-card p-4 mb-4">
                     <h3 class="font-bold text-zinc-100 text-lg mb-4 text-right">${item.name}</h3>
                     <div class="flex gap-2">`;
 
+                // التعديل هنا: عرض أي سعر موجود في الشيت بدون قيود الأقسام
                 item.prices.forEach((p, i) => {
-                    // الكود دلوقتى هيعرض أي خانة فيها سعر (مش فاضية ومش صفر)
-                    if (p !== null && p !== undefined && p !== "" && p !== 0) {
-                        let labelText = labels[i] || `حجم ${i+1}`;
-                        html += `<div onclick="addToCart('${item.name} (${labelText})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-900/20">
-                            <span class="block text-[10px] text-zinc-500 mb-1">${labelText}</span>
+                    if (p && p !== "" && p !== 0) {
+                        html += `<div onclick="addToCart('${item.name} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-900/20">
+                            <span class="block text-[10px] text-zinc-500 mb-1">${labels[i]}</span>
                             <span class="text-white font-bold">${p}ج</span>
                             <div class="plus-icon">+</div>
                         </div>`;
@@ -133,43 +112,6 @@
             document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
         }
 
-        function openCart() {
-            if (cart.length === 0) return alert("السلة فارغة!");
-            const list = document.getElementById('cart-items-list');
-            list.innerHTML = "";
-            let total = 0;
-            cart.forEach((item, index) => {
-                total += item.price * item.qty;
-                list.innerHTML += `<div class="flex justify-between items-center bg-black p-3 rounded-xl border border-zinc-800">
-                    <button onclick="removeFromCart(${index})" class="text-red-500 text-xs">حذف</button>
-                    <div>
-                        <div class="text-white font-bold text-sm">${item.name}</div>
-                        <div class="text-zinc-500 text-[10px]">${item.qty} x ${item.price}ج</div>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('total-price-display').innerText = `الإجمالي: ${total} جنيه`;
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        }
-
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
-            if(cart.length === 0) closeCart(); else openCart();
-            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
-        }
-
-        function closeCart() { document.getElementById('checkout-modal').classList.add('hidden'); }
-
-        function sendToWhatsApp() {
-            const name = document.getElementById('user-name').value;
-            const phone = document.getElementById('user-phone').value;
-            const addr = document.getElementById('user-address').value;
-            if (!name || !phone || !addr) return alert("اكمل البيانات أولاً!");
-            
-            let msg = `*طلب جديد من منيو توستا*\nالاسم: ${name}\nالموبايل: ${phone}\nالعنوان: ${addr}\n\n`;
-            cart.forEach(i => msg += `• ${i.name} (عدد ${i.qty}) = ${i.qty * i.price}ج\n`);
-            window.open(`https://wa.me/${restaurantPhone}?text=${encodeURIComponent(msg)}`);
-        }
         window.onload = fetchMenu;
     </script>
 </body>
