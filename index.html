@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tosta Menu | منيو توستا</title>
+    <title>Tosta Menu | مطعم توستا</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; overflow-x: hidden; }
         .sticky-header { position: sticky; top: 0; z-index: 100; background-color: black; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
-        .sticky-nav { position: sticky; top: 155px; z-index: 90; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sticky-nav { position: sticky; top: 180px; z-index: 90; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; border: 1px solid #3f3f46; }
         .category-tab.active { background-color: #ff3131; color: white; border-color: #ff3131; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
         .price-card { background: #1a1a1a; border: 1px solid #333; border-radius: 1.2rem; overflow: hidden; position: relative; }
@@ -17,6 +17,9 @@
         .horizontal-scroll::-webkit-scrollbar { display: none; }
         .plus-icon { position: absolute; top: 0; right: 0; background: #ff3131; color: white; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border-radius: 0 0 0 10px; }
         .logo-container img { max-width: 90px; margin: 0 auto 5px; display: block; border-radius: 12px; }
+        
+        /* ضبط محاذاة حقول الإدخال لتكون على اليمين دائماً */
+        input, textarea { text-align: right; direction: rtl; }
     </style>
 </head>
 <body>
@@ -25,7 +28,9 @@
         <div class="logo-container">
             <img src="Tosta.jpg" alt="Tosta Logo" onerror="this.style.display='none'">
         </div>
-        <h1 class="text-3xl font-black text-red-600 tracking-tighter">TOSTA</h1>
+        <h1 class="text-3xl font-black text-white tracking-tighter">مطعم توستا</h1>
+        <p class="text-red-500 text-sm font-bold mt-1">الأكل بشكل تاني ❤️</p>
+        
         <div id="cart-btn" onclick="openCart()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-zinc-900 p-3 rounded-full cursor-pointer border border-zinc-700 shadow-lg active:scale-95 transition-transform" style="z-index: 110;">
             🛒 <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
         </div>
@@ -101,17 +106,17 @@
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 border-r-4 border-red-500 pr-3">${catName}</h2>`;
             let labels = ["السعر", "وسط", "كبير"];
             
-            if (catName.includes("مكرونة")) {
+            if (catName.indexOf("مكرونة") !== -1 || catName.indexOf("المكرونة") !== -1) {
                 labels = ["أبيض", "أحمر", ""];
-            } else if (catName.includes("عربي")) {
+            } else if (catName.indexOf("عربي") !== -1) {
                 labels = ["السعر", "", ""];
-            } else if (catName.includes("شاورما")) {
+            } else if (catName.indexOf("شاورما") !== -1) {
                 labels = ["فينو", "سوري", "XL"];
-            } else if (catName.includes("برجر")) {
+            } else if (catName.indexOf("برجر") !== -1) {
                 labels = ["فراخ", "لحمة", "دبل"];
-            } else if (catName.includes("بيتزا")) {
+            } else if (catName.indexOf("بيتزا") !== -1) {
                 labels = ["صغير", "وسط", "كبير"];
-            } else if (catName.includes("الحلو")) {
+            } else if (catName.indexOf("الحلو") !== -1) {
                 labels = ["وسط", "", ""];
             } else if (catName === "ركن الفطير") {
                 labels = ["إسكندراني", "شرقي", ""];
@@ -139,14 +144,12 @@
             document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
         }
 
-        // تحسين زر الرجوع في المتصفح
         function openCart() {
             if (cart.length === 0) return alert("السلة فارغة!");
             const list = document.getElementById('cart-items-list');
             list.innerHTML = ""; let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
-                // تعديل هنا: عرض اسم القسم والطلب معاً
                 list.innerHTML += `<div class="flex justify-between items-center bg-black p-4 rounded-xl border border-zinc-800">
                     <button onclick="removeFromCart(${index})" class="text-red-500 font-bold px-3">حذف</button>
                     <div class="text-right">
@@ -157,13 +160,10 @@
             });
             document.getElementById('total-price-display').innerText = `إجمالي الحساب: ${total} جنيه`;
             document.getElementById('checkout-modal').classList.remove('hidden');
-            
-            // إضافة حالة جديدة للتاريخ للتحكم في زر الرجوع
             window.history.pushState({modalOpen: true}, "");
         }
 
         window.onpopstate = function(event) {
-            // لو اليوزر داس رجوع والسلة مفتوحة، نقفلها بدل ما نخرج
             if (document.getElementById('checkout-modal').classList.contains('hidden') === false) {
                 closeCart();
             }
@@ -184,10 +184,13 @@
             const phone = document.getElementById('user-phone').value.trim();
             const addr = document.getElementById('user-address').value.trim();
             if (!name || !phone || !addr) return alert("أكمل بيانات التوصيل أولاً!");
-            let msg = `*طلب جديد من منيو توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${addr}\n\n🛒 *الطلبات:*\n`;
+            let msg = `*طلب جديد من مطعم توستا*\n\n`;
+            msg += `👤 *الاسم:* ${name}\n`;
+            msg += `📞 *الموبايل:* ${phone}\n`;
+            msg += `📍 *العنوان:* ${addr}\n\n`;
+            msg += `🛒 *الطلبات:*\n`;
             let total = 0;
             cart.forEach(i => {
-                // تعديل هنا: اسم القسم ملتصق باسم الطلب في الواتساب
                 msg += `• ${i.cat} ${i.name} (عدد ${i.qty}) = ${i.qty * i.price}ج\n`;
                 total += i.qty * i.price;
             });
