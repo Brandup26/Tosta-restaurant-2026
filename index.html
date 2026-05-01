@@ -80,19 +80,21 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500">• ${catName}</h2>`;
             
-            // التعديل الجديد للمسميات بناءً على طلبك
-            let labels = ["صغير", "وسط", "كبير"];
+            // المسميات الجديدة حسب طلبك
+            let labels = ["السعر", "وسط", "كبير"]; // السعر بدل صغير كافتراضي
             
             if (catName.includes("شاورما")) {
                 labels = ["فينو", "سوري", "XL"];
             } else if (catName.includes("برجر")) {
                 labels = ["فراخ", "لحمة", "دبل"];
-            } else if (catName.includes("الفطير الحلو")) {
-                labels = ["وسط", "", ""]; // تغيير صغير لوسط في الحلو
-            } else if (catName === "ركن الفطير") {
-                labels = ["إسكندراني", "شرقي", ""]; // تغيير مسميات الفطير الحادق
+            } else if (catName.includes("المكرونة")) {
+                labels = ["أبيض", "أحمر", ""]; // مسميات المكرونة الجديدة
             } else if (catName.includes("بيتزا")) {
                 labels = ["صغير", "وسط", "كبير"];
+            } else if (catName.includes("الفطير الحلو")) {
+                labels = ["وسط", "", ""];
+            } else if (catName === "ركن الفطير") {
+                labels = ["إسكندراني", "شرقي", ""];
             }
 
             menuData[catName].forEach(item => {
