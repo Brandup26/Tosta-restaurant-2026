@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم توستا - الأكل بشكل تاني ❤️</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tosta">
+    <link rel="apple-touch-icon" href="Tosta.jpg">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff3131">
+
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; overflow-x: hidden; scroll-behavior: smooth; }
         
-        /* تثبيت الهيدر والأقسام */
         .header-wrapper { position: sticky; top: 0; z-index: 100; background-color: black; border-bottom: 1px solid #27272a; }
         .sticky-header { padding: 25px 0; text-align: center; }
         .sticky-nav { background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); padding: 15px 0; }
@@ -25,7 +33,6 @@
         
         .logo-container img { max-width: 100px; margin: 0 auto 8px; display: block; border-radius: 15px; }
         
-        /* خانات البيانات */
         .input-field { width: 100%; border: 1px solid #27272a; padding: 16px; border-radius: 15px; color: white; outline: none; background: #000; text-align: right; }
         .input-field:focus { border-color: #ff3131; }
 
@@ -80,6 +87,11 @@
     </div>
 
     <script>
+        // تسجيل الـ Service Worker لدعم الـ PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered"));
+        }
+
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
         const restaurantPhone = "201032512003";
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&cache_bust=${Date.now()}`;
@@ -117,11 +129,7 @@
                     document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderCategory(cat);
-                    
-                    // إصلاح مشكلة الـ Scroll: الصعود لأعلى القائمة
-                    const headerOffset = document.getElementById('top-anchor').offsetHeight;
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    
                     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 };
                 nav.appendChild(btn);
