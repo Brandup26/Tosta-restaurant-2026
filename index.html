@@ -1,88 +1,134 @@
-<script>
-    const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
-    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tosta Menu | منيو توستا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin: 0; padding: 0; }
+        .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; cursor: pointer; }
+        .category-tab.active { background-color: #ff3131; color: white; border-color: #ff3131; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
+        .price-card { background: #1a1a1a; border: 1px solid #333; border-radius: 1rem; overflow: hidden; }
+        .horizontal-scroll { overflow-x: auto; display: flex; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .horizontal-scroll::-webkit-scrollbar { display: none; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #ff3131; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
 
-    let menuData = {};
+    <header class="text-center py-6 bg-black border-b border-zinc-800">
+        <h1 class="text-4xl font-bold text-red-600 tracking-tighter">TOSTA</h1>
+        <p class="text-zinc-500 text-[10px] uppercase mt-1 tracking-[0.2em]">Quality Food Experience</p>
+    </header>
 
-    async function fetchMenu() {
-        try {
-            const response = await fetch(url);
-            const text = await response.text();
-            const json = JSON.parse(text.substr(47).slice(0, -2));
-            const rows = json.table.rows;
+    <nav id="category-nav" class="horizontal-scroll sticky top-0 z-50 bg-black/95 backdrop-blur-md py-4 px-4 gap-3 border-b border-white/10">
+        <div class="loader"></div>
+    </nav>
 
-            rows.forEach((row, index) => {
-                if (index === 0) return;
-                const category = row.c[0]?.v || "أخرى";
-                const item = {
-                    name: row.c[1]?.v || "",
-                    price1: row.c[2]?.v || null,
-                    price2: row.c[3]?.v || null,
-                    price3: row.c[4]?.v || null
-                };
-                if (!menuData[category]) menuData[category] = [];
-                menuData[category].push(item);
-            });
+    <main id="menu-container" class="container mx-auto px-4 py-8 max-w-md">
+        <div id="status-msg" class="text-center text-zinc-500 mt-10">جاري جلب البيانات من الشيت...</div>
+    </main>
 
-            renderNav();
-            renderCategory(Object.keys(menuData)[0]);
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    }
+    <script>
+        const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
+        // الرابط المعدل لجلب البيانات بصيغة JSON
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    function renderNav() {
-        const nav = document.getElementById('category-nav');
-        nav.innerHTML = '';
-        Object.keys(menuData).forEach((cat, index) => {
-            const btn = document.createElement('button');
-            btn.className = `category-tab px-5 py-2 rounded-xl text-sm font-bold border border-zinc-700 bg-zinc-900 ${index === 0 ? 'active' : ''}`;
-            btn.innerText = cat;
-            btn.onclick = () => {
-                document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderCategory(cat);
-                btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-            };
-            nav.appendChild(btn);
-        });
-    }
+        let menuData = {};
 
-    function renderCategory(catName) {
-        const container = document.getElementById('menu-container');
-        container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full"></span> ${catName}</h2>`;
-        
-        // التعديل هنا: تحديد المسميات بناءً على القسم وعدد الخانات
-        let label1 = ""; let label2 = ""; let label3 = "";
+        async function fetchMenu() {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const text = await response.text();
+                // تنظيف الداتا اللي جاية من جوجل
+                const jsonData = JSON.parse(text.substring(47).slice(0, -2));
+                const rows = jsonData.table.rows;
 
-        if (catName.includes("بيتزا") || catName.includes("فطير")) {
-            label1 = "صغير"; label2 = "وسط"; label3 = "كبير";
-        } else if (catName.includes("برجر")) {
-            label1 = "فراخ"; label2 = "لحمة"; label3 = "";
-        } else if (catName.includes("مكرونة")) {
-            label1 = "أبيض"; label2 = "أحمر"; label3 = "";
-        } else if (catName.includes("كريب حادق")) {
-            label1 = "عادي"; label2 = "كونو"; label3 = "سوبر";
-        } else if (catName.includes("شاورما")) {
-            label1 = "فينو"; label2 = "سوري"; label3 = "XL";
-        } else {
-            label1 = "السعر"; label2 = ""; label3 = "";
-        }
+                if (!rows || rows.length === 0) {
+                    document.getElementById('status-msg').innerText = "الشيت فاضي أو ممسوح!";
+                    return;
+                }
 
-        menuData[catName].forEach(item => {
-            const itemHtml = `
-                <div class="price-card p-4 rounded-2xl mb-4 shadow-lg border border-white/5">
-                    <h3 class="text-md font-bold mb-3 text-zinc-100">${item.name}</h3>
-                    <div class="flex gap-2 text-center">
-                        ${item.price1 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label1}</span><span class="text-white font-bold font-sans">${item.price1}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
-                        ${item.price2 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label2}</span><span class="text-white font-bold font-sans">${item.price2}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
-                        ${item.price3 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label3}</span><span class="text-white font-bold font-sans">${item.price3}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
+                menuData = {};
+                rows.forEach((row, index) => {
+                    if (index === 0) return; // تخطي العناوين
+                    const category = row.c[0]?.v || "أخرى";
+                    const item = {
+                        name: row.c[1]?.v || "",
+                        price1: row.c[2]?.v || null,
+                        price2: row.c[3]?.v || null,
+                        price3: row.c[4]?.v || null
+                    };
+                    if (!menuData[category]) menuData[category] = [];
+                    menuData[category].push(item);
+                });
+
+                renderNav();
+                renderCategory(Object.keys(menuData)[0]);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('menu-container').innerHTML = `
+                    <div class="text-center p-6 bg-red-900/20 border border-red-500/50 rounded-2xl">
+                        <p class="text-red-500 font-bold mb-2">عذراً! فيه مشكلة في الاتصال</p>
+                        <p class="text-xs text-zinc-400">تأكد إن الشيت معمول له Share "Anyone with the link"</p>
+                        <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-red-600 rounded-lg text-xs">إعادة محاولة</button>
                     </div>
-                </div>
-            `;
-            container.innerHTML += itemHtml;
-        });
-    }
+                `;
+            }
+        }
 
-    fetchMenu();
-</script>
+        function renderNav() {
+            const nav = document.getElementById('category-nav');
+            nav.innerHTML = '';
+            Object.keys(menuData).forEach((cat, index) => {
+                const btn = document.createElement('button');
+                btn.className = `category-tab px-5 py-2 rounded-xl text-sm font-bold border border-zinc-700 bg-zinc-900 ${index === 0 ? 'active' : ''}`;
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderCategory(cat);
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                };
+                nav.appendChild(btn);
+            });
+        }
+
+        function renderCategory(catName) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full"></span> ${catName}</h2>`;
+            
+            let label1 = "صغير"; let label2 = "وسط"; let label3 = "كبير";
+
+            // تخصيص العناوين حسب طلبك
+            if (catName.includes("برجر")) { label1 = "فراخ"; label2 = "لحمة"; label3 = ""; }
+            else if (catName.includes("مكرونة")) { label1 = "أبيض"; label2 = "أحمر"; label3 = ""; }
+            else if (catName.includes("كريب حادق")) { label1 = "عادي"; label2 = "كونو"; label3 = "سوبر"; }
+            else if (catName.includes("شاورما")) { label1 = "فينو"; label2 = "سوري"; label3 = "XL"; }
+            else if (catName.includes("إضافات") || catName.includes("وجبات") || catName.includes("حلو") || catName.includes("ريزو")) { label1 = "السعر"; label2 = ""; label3 = ""; }
+
+            menuData[catName].forEach(item => {
+                const itemHtml = `
+                    <div class="price-card p-4 mb-4 shadow-lg border border-white/5">
+                        <h3 class="text-md font-bold mb-3 text-zinc-100">${item.name}</h3>
+                        <div class="flex gap-2 text-center">
+                            ${item.price1 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label1}</span><span class="text-white font-bold font-sans">${item.price1}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
+                            ${item.price2 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label2}</span><span class="text-white font-bold font-sans">${item.price2}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
+                            ${item.price3 ? `<div class="flex-1 bg-zinc-800/50 p-2 rounded-xl border border-white/5"><span class="block text-[10px] text-zinc-500 mb-1">${label3}</span><span class="text-white font-bold font-sans">${item.price3}</span><span class="text-[10px] text-zinc-400 mr-1">ج</span></div>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHtml;
+            });
+        }
+
+        // تشغيل الكود عند التحميل
+        window.onload = fetchMenu;
+    </script>
+</body>
+</html>
