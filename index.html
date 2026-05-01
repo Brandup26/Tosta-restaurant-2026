@@ -28,15 +28,17 @@
         .price-card { background: #1a1a1a; border: 1px solid #333; border-radius: 1.2rem; overflow: hidden; position: relative; padding: 15px; margin-bottom: 15px; }
         
         /* تصميم خاص واحترافي للوجبات */
-        .meal-card { background: linear-gradient(145deg, #1a1a1a, #111); border: 1px solid #444; border-radius: 1.5rem; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .meal-info { flex: 1; }
-        .meal-price-btn { background: #ff3131; color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; min-width: 80px; }
-        .meal-price-btn:active { scale: 0.95; background: #cc0000; }
+        .meal-card { background: #161616; border: 1px solid #222; border-radius: 1.2rem; padding: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .meal-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .meal-name { font-weight: 900; font-size: 1.1rem; color: #fff; }
+        .meal-desc { font-size: 0.75rem; color: #71717a; line-height: 1.4; }
+        
+        .meal-price-btn { background: #ff3131; color: white; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; min-width: 70px; border: none; }
+        .meal-price-btn:active { scale: 0.92; }
 
         .plus-icon { position: absolute; top: 0; right: 0; background: #ff3131; color: white; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border-radius: 0 0 0 10px; }
         .logo-container img { max-width: 100px; margin: 0 auto 8px; display: block; border-radius: 15px; }
         .input-field { width: 100%; border: 1px solid #27272a; padding: 16px; border-radius: 15px; color: white; outline: none; background: #000; text-align: right; }
-        .input-field:focus { border-color: #ff3131; }
         .designer-box { margin-top: 50px; padding: 30px 20px; border-top: 1px solid #27272a; text-align: center; color: #71717a; font-size: 13px; background: #050505; }
         .designer-box a { color: #ff3131; text-decoration: none; font-weight: bold; }
     </style>
@@ -62,9 +64,9 @@
     <main id="menu-container" class="container mx-auto px-4 py-6 max-w-md"></main>
 
     <div class="designer-box">
+        <p class="mb-4 text-zinc-300 font-bold">جميع الحقوق محفوظة لمطعم توستا © 2026</p>
         <p dir="ltr">Designed by Eng / <span class="text-white">Anas Gaber Shehata</span></p>
         <p class="mt-2" dir="ltr">📞 <a href="tel:01003800314">01003800314</a></p>
-        <p class="mt-4 text-[10px]">جميع الحقوق محفوظة لمطعم توستا © 2026</p>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 z-[150] hidden bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
@@ -85,10 +87,6 @@
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered"));
-        }
-
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
         const restaurantPhone = "201032512003";
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&cache_bust=${Date.now()}`;
@@ -106,7 +104,12 @@
                 rows.forEach((row, index) => {
                     if (index === 0) return;
                     const cat = row.c[0]?.v || "أخرى";
-                    const item = { category: cat, name: row.c[1]?.v || "", prices: [row.c[2]?.v, row.c[3]?.v, row.c[4]?.v] };
+                    const item = { 
+                        category: cat, 
+                        name: row.c[1]?.v || "", 
+                        prices: [row.c[2]?.v, row.c[3]?.v, row.c[4]?.v],
+                        desc: row.c[5]?.v || "أجمد وجبة من توستا 🔥"
+                    };
                     if (!menuData[cat]) menuData[cat] = [];
                     menuData[cat].push(item);
                 });
@@ -126,8 +129,6 @@
                     document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderCategory(cat);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 };
                 nav.appendChild(btn);
             });
@@ -141,22 +142,20 @@
             let labels = ["السعر", "وسط", "كبير"];
             if (catName.includes("مكرونة")) labels = ["أبيض", "أحمر", ""];
             else if (catName.includes("شاورما")) labels = ["فينو", "سوري", "XL"];
-            else if (catName.includes("برجر")) labels = ["فراخ", "لحمة", "دبل"];
             else if (catName.includes("بيتزا")) labels = ["صغير", "وسط", "كبير"];
 
             menuData[catName].forEach(item => {
                 if (isMeal) {
-                    // العثور على أول سعر غير صفري
                     let price = item.prices.find(p => p && p !== 0) || 0;
                     if (price > 0) {
                         container.innerHTML += `
                             <div class="meal-card">
                                 <div class="meal-info">
-                                    <h3 class="font-bold text-lg text-white mb-1">${item.name}</h3>
-                                    <p class="text-zinc-500 text-xs">وجبة توستا المميزة</p>
+                                    <span class="meal-name">${item.name}</span>
+                                    <p class="meal-desc">${item.desc}</p>
                                 </div>
                                 <div onclick="addToCart('${item.category}', '${item.name}', ${price})" class="meal-price-btn">
-                                    <span style="font-size: 10px; opacity: 0.8; margin-bottom: 2px;">إضافة</span>
+                                    <span style="font-size:9px; opacity:0.8">إضافة</span>
                                     <span class="text-lg font-black">${price}ج</span>
                                 </div>
                             </div>`;
@@ -181,7 +180,7 @@
         function addToCart(cat, name, price) {
             const existing = cart.find(i => i.name === name);
             if (existing) existing.qty++; else cart.push({ cat, name, price, qty: 1 });
-            updateCartUI();
+            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
         }
 
         function openCart() {
@@ -192,7 +191,6 @@
                 total += item.price * item.qty;
                 let cleanCat = item.cat.replace("ركن ", "").replace("قسم ", "").trim();
                 let cleanName = item.name.replace(cleanCat, "").trim();
-                
                 list.innerHTML += `<div class="flex justify-between items-center bg-black p-4 rounded-xl border border-zinc-800 text-right">
                     <button onclick="removeFromCart(${index})" class="text-red-500 font-bold px-3">حذف</button>
                     <div>
@@ -203,20 +201,15 @@
             });
             document.getElementById('total-price-display').innerText = `إجمالي الحساب: ${total} جنيه`;
             document.getElementById('checkout-modal').classList.remove('hidden');
-            window.history.pushState({modalOpen: true}, "");
         }
 
-        window.onpopstate = function() { if (!document.getElementById('checkout-modal').classList.contains('hidden')) closeCart(); };
-        function removeFromCart(idx) { cart.splice(idx, 1); if(cart.length === 0) closeCart(); else openCart(); updateCartUI(); }
-        function updateCartUI() { document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0); }
+        function removeFromCart(idx) { cart.splice(idx, 1); if(cart.length === 0) closeCart(); else openCart(); document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0); }
         function closeCart() { document.getElementById('checkout-modal').classList.add('hidden'); }
-
         function sendToWhatsApp() {
             const name = document.getElementById('user-name').value.trim();
             const phone = document.getElementById('user-phone').value.trim();
             const addr = document.getElementById('user-address').value.trim();
             if (!name || !phone || !addr) return alert("أكمل بيانات التوصيل أولاً!");
-            
             let msg = `*طلب جديد من مطعم توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${addr}\n\n🛒 *الطلبات:*\n`;
             let total = 0;
             cart.forEach(i => {
