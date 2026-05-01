@@ -80,17 +80,26 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500">• ${catName}</h2>`;
             
-            // تحديد أسماء الأحجام بشكل ذكي
+            // التعديل الجديد للمسميات بناءً على طلبك
             let labels = ["صغير", "وسط", "كبير"];
-            if (catName.includes("شاورما")) labels = ["فينو", "سوري", "XL"];
-            if (catName.includes("برجر")) labels = ["فراخ", "لحمة", "دبل"];
+            
+            if (catName.includes("شاورما")) {
+                labels = ["فينو", "سوري", "XL"];
+            } else if (catName.includes("برجر")) {
+                labels = ["فراخ", "لحمة", "دبل"];
+            } else if (catName.includes("الفطير الحلو")) {
+                labels = ["وسط", "", ""]; // تغيير صغير لوسط في الحلو
+            } else if (catName === "ركن الفطير") {
+                labels = ["إسكندراني", "شرقي", ""]; // تغيير مسميات الفطير الحادق
+            } else if (catName.includes("بيتزا")) {
+                labels = ["صغير", "وسط", "كبير"];
+            }
 
             menuData[catName].forEach(item => {
                 let html = `<div class="price-card p-4 mb-4">
                     <h3 class="font-bold text-zinc-100 text-lg mb-4 text-right">${item.name}</h3>
                     <div class="flex gap-2">`;
 
-                // التعديل هنا: عرض أي سعر موجود في الشيت بدون قيود الأقسام
                 item.prices.forEach((p, i) => {
                     if (p && p !== "" && p !== 0) {
                         html += `<div onclick="addToCart('${item.name} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-900/20">
