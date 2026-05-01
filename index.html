@@ -51,7 +51,8 @@
     <script>
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
         const restaurantPhone = "201014163994";
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        // إضافة راندوم نمبر للرابط عشان نضمن إن المتصفح ميجبش نسخة قديمة من الشيت
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&t=${Date.now()}`;
 
         let menuData = {};
         let cart = [];
@@ -63,6 +64,7 @@
                 const json = JSON.parse(text.substring(47).slice(0, -2));
                 const rows = json.table.rows;
 
+                menuData = {}; // تصقير البيانات قبل القراءة
                 rows.forEach((row, index) => {
                     if (index === 0) return;
                     const cat = row.c[0]?.v || "أخرى";
@@ -76,11 +78,12 @@
 
                 renderNav();
                 renderCategory(Object.keys(menuData)[0]);
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error fetching data:", e); }
         }
 
         function renderNav() {
             const nav = document.getElementById('category-nav');
+            nav.innerHTML = "";
             Object.keys(menuData).forEach((cat, i) => {
                 const btn = document.createElement('button');
                 btn.className = `category-tab px-5 py-2 rounded-xl text-sm font-bold border border-zinc-700 bg-zinc-900 ${i === 0 ? 'active' : ''}`;
@@ -99,7 +102,7 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> ${catName}</h2>`;
             
-            // تحديد الأسماء بشكل مرن
+            // قاموس المسميات بناءً على القسم
             let labelTypes = {
                 "بيتزا": ["صغير", "وسط", "كبير"],
                 "فطير": ["صغير", "وسط", "كبير"],
@@ -118,22 +121,17 @@
             }
 
             menuData[catName].forEach(item => {
-                let parts = item.name.split('(');
-                let title = parts[0].trim();
-                let desc = parts[1] ? '(' + parts[1] : "";
-
                 let html = `<div class="price-card p-4 mb-4">
                     <div class="mb-4 text-right">
-                        <h3 class="font-bold text-zinc-100 text-lg">${title}</h3>
-                        <p class="text-[11px] text-zinc-500 mt-1">${desc}</p>
+                        <h3 class="font-bold text-zinc-100 text-lg">${item.name}</h3>
                     </div>
                     <div class="flex gap-2 text-center">`;
 
-                // لوب بيعرض أي سعر موجود في الشيت بغض النظر عن مكانه
+                // لوب يعرض أي رقم مكتوب في الشيت بدون استثناء
                 item.prices.forEach((p, i) => {
-                    if (p !== null && p !== undefined && p !== "") {
+                    if (p !== null && p !== undefined && p !== "" && p !== 0) {
                         let label = currentLabels[i] || `حجم ${i+1}`;
-                        html += `<div onclick="addToCart('${title} (${label})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative cursor-pointer">
+                        html += `<div onclick="addToCart('${item.name} (${label})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative cursor-pointer">
                             <span class="block text-[10px] text-zinc-500 mb-1">${label}</span>
                             <span class="text-white font-bold text-md">${p}ج</span>
                             <div class="plus-icon">+</div>
