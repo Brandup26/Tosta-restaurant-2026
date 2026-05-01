@@ -99,12 +99,23 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> ${catName}</h2>`;
             
-            // تحديد التسميات بناءً على القسم وبعدد الأسعار المتاحة
-            let labels = ["صغير", "وسط", "كبير"];
-            if (catName.includes("برجر")) labels = ["فراخ", "لحمة", ""];
-            else if (catName.includes("شاورما") && !catName.includes("ريزو")) labels = ["فينو", "سوري", "XL"];
-            else if (catName.includes("كريب حادق")) labels = ["عادي", "كونو", "سوبر"];
-            else if (catName.includes("إضافات") || catName.includes("وجبات") || catName.includes("ريزو")) labels = ["السعر", "", ""];
+            // تحديد الأسماء بشكل مرن
+            let labelTypes = {
+                "بيتزا": ["صغير", "وسط", "كبير"],
+                "فطير": ["صغير", "وسط", "كبير"],
+                "برجر": ["فراخ", "لحمة", ""],
+                "شاورما": ["فينو", "سوري", "XL"],
+                "كريب": ["عادي", "كونو", "سوبر"],
+                "default": ["صغير", "وسط", "كبير"]
+            };
+
+            let currentLabels = labelTypes["default"];
+            for (let key in labelTypes) {
+                if (catName.includes(key)) {
+                    currentLabels = labelTypes[key];
+                    break;
+                }
+            }
 
             menuData[catName].forEach(item => {
                 let parts = item.name.split('(');
@@ -118,11 +129,12 @@
                     </div>
                     <div class="flex gap-2 text-center">`;
 
+                // لوب بيعرض أي سعر موجود في الشيت بغض النظر عن مكانه
                 item.prices.forEach((p, i) => {
-                    // تم تعديل الشرط هنا ليعرض السعر طالما القيمة موجودة في الشيت
-                    if (p !== null && p !== undefined && p !== "" && labels[i] !== "") {
-                        html += `<div onclick="addToCart('${title} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative cursor-pointer">
-                            <span class="block text-[10px] text-zinc-500 mb-1">${labels[i]}</span>
+                    if (p !== null && p !== undefined && p !== "") {
+                        let label = currentLabels[i] || `حجم ${i+1}`;
+                        html += `<div onclick="addToCart('${title} (${label})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative cursor-pointer">
+                            <span class="block text-[10px] text-zinc-500 mb-1">${label}</span>
                             <span class="text-white font-bold text-md">${p}ج</span>
                             <div class="plus-icon">+</div>
                         </div>`;
@@ -181,7 +193,6 @@
             const phone = document.getElementById('user-phone').value.trim();
             const address = document.getElementById('user-address').value.trim();
             if (!name || !phone || !address) return alert("اكمل البيانات أولاً!");
-
             let msg = `*طلب جديد من منيو توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${address}\n─────────────────\n🛒 *الطلبات:*\n`;
             let total = 0;
             cart.forEach(i => {
@@ -191,7 +202,6 @@
             msg += `─────────────────\n💰 *الإجمالي:* ${total} جنيه`;
             window.open(`https://wa.me/${restaurantPhone}?text=${encodeURIComponent(msg)}`);
         }
-
         window.onload = fetchMenu;
     </script>
 </body>
