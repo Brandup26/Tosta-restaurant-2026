@@ -7,24 +7,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #0c0c0c; color: white; margin-bottom: 80px; overflow-x: hidden; }
         
-        /* تثبيت الهيدر والأقسام */
-        .sticky-header { position: sticky; top: 0; z-index: 100; background-color: black; border-bottom: 1px solid #27272a; }
-        .sticky-nav { position: sticky; top: 160px; z-index: 90; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sticky-header { position: sticky; top: 0; z-index: 100; background-color: black; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
+        .sticky-nav { position: sticky; top: 155px; z-index: 90; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
 
-        .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; }
-        .category-tab.active { background-color: #ff3131; color: white; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
+        .category-tab { white-space: nowrap; transition: all 0.3s; flex-shrink: 0; border: 1px solid #3f3f46; }
+        .category-tab.active { background-color: #ff3131; color: white; border-color: #ff3131; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
         
         .price-card { background: #1a1a1a; border: 1px solid #333; border-radius: 1.2rem; overflow: hidden; position: relative; }
         .horizontal-scroll { overflow-x: auto; display: flex; scrollbar-width: none; }
         .horizontal-scroll::-webkit-scrollbar { display: none; }
         
         .plus-icon { position: absolute; top: 0; right: 0; background: #ff3131; color: white; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border-radius: 0 0 0 10px; }
-        .logo-container img { max-width: 100px; margin: 0 auto 5px; display: block; border-radius: 12px; }
+        .logo-container img { max-width: 90px; margin: 0 auto 5px; display: block; border-radius: 12px; }
         
-        /* تحسين زر السلة */
-        #cart-btn { z-index: 110; pointer-events: auto; }
+        input, textarea { text-align: right; }
     </style>
 </head>
 <body>
@@ -35,7 +33,7 @@
         </div>
         <h1 class="text-3xl font-black text-red-600 tracking-tighter">TOSTA</h1>
         
-        <div id="cart-btn" onclick="openCart()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-zinc-900 p-3 rounded-full cursor-pointer border border-zinc-700 shadow-lg active:scale-90 transition-transform">
+        <div id="cart-btn" onclick="openCart()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-zinc-900 p-3 rounded-full cursor-pointer border border-zinc-700 shadow-lg active:scale-95 transition-transform" style="z-index: 110;">
             🛒 <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
         </div>
     </header>
@@ -44,19 +42,21 @@
 
     <main id="menu-container" class="container mx-auto px-4 py-8 max-w-md"></main>
 
-    <div id="checkout-modal" class="fixed inset-0 z-[150] hidden bg-black/90 backdrop-blur-md p-4 overflow-y-auto text-right">
-        <div class="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-6 mt-10 border border-zinc-700">
-            <h2 class="text-2xl font-bold mb-4 text-red-500 text-center">سلة الطلبات</h2>
+    <div id="checkout-modal" class="fixed inset-0 z-[150] hidden bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-6 mt-6 border border-zinc-700 shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6 text-red-500 text-center">تفاصيل الطلب</h2>
             <div id="cart-items-list" class="mb-6 space-y-3"></div>
-            <div id="total-price-display" class="text-center font-bold text-xl mb-6 bg-zinc-800 py-3 rounded-xl"></div>
+            <div id="total-price-display" class="text-center font-bold text-xl mb-6 bg-zinc-800 py-4 rounded-2xl text-red-500"></div>
+            
             <div class="space-y-4">
-                <input type="text" id="user-name" placeholder="الاسم بالكامل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none focus:border-red-600 text-white text-right">
-                <input type="tel" id="user-phone" placeholder="رقم الموبايل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none focus:border-red-600 text-white text-right">
-                <textarea id="user-address" placeholder="العنوان بالتفصيل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl outline-none h-24 focus:border-red-600 text-white text-right"></textarea>
+                <input type="text" id="user-name" placeholder="الاسم بالكامل" class="w-full bg-black border border-zinc-800 p-4 rounded-xl outline-none focus:border-red-600 text-white">
+                <input type="tel" id="user-phone" placeholder="رقم الموبايل" class="w-full bg-black border border-zinc-800 p-4 rounded-xl outline-none focus:border-red-600 text-white">
+                <textarea id="user-address" placeholder="العنوان بالتفصيل" class="w-full bg-black border border-zinc-800 p-4 rounded-xl outline-none h-24 focus:border-red-600 text-white"></textarea>
             </div>
+            
             <div class="mt-8 flex gap-3">
-                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-600 font-bold py-4 rounded-xl text-white">إرسال للواتساب</button>
-                <button onclick="closeCart()" class="px-6 bg-zinc-800 text-zinc-400 rounded-xl">إلغاء</button>
+                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-600 font-bold py-4 rounded-2xl text-white shadow-lg active:opacity-80">إرسال عبر الواتساب</button>
+                <button onclick="closeCart()" class="px-6 bg-zinc-800 text-zinc-400 rounded-2xl font-bold">إلغاء</button>
             </div>
         </div>
     </div>
@@ -81,6 +81,7 @@
                     if (index === 0) return;
                     const cat = row.c[0]?.v || "أخرى";
                     const item = { 
+                        category: cat,
                         name: row.c[1]?.v || "", 
                         prices: [row.c[2]?.v, row.c[3]?.v, row.c[4]?.v]
                     };
@@ -98,13 +99,12 @@
             nav.innerHTML = "";
             Object.keys(menuData).forEach((cat, i) => {
                 const btn = document.createElement('button');
-                btn.className = `category-tab px-5 py-2 rounded-xl text-sm font-bold border border-zinc-700 bg-zinc-900 ${i === 0 ? 'active' : ''}`;
+                btn.className = `category-tab px-5 py-2 rounded-xl text-sm font-bold bg-zinc-900 ${i === 0 ? 'active' : ''}`;
                 btn.innerText = cat;
                 btn.onclick = () => {
                     document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderCategory(cat);
-                    // التمرير التلقائي للقسم عند الضغط
                     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 };
                 nav.appendChild(btn);
@@ -113,12 +113,12 @@
 
         function renderCategory(catName) {
             const container = document.getElementById('menu-container');
-            container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> ${catName}</h2>`;
+            container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 border-r-4 border-red-500 pr-3">${catName}</h2>`;
             
             let labels = ["السعر", "وسط", "كبير"]; 
             
             if (catName.includes("المكرونة")) {
-                labels = ["أبيض", "أحمر", ""];
+                labels = ["أبيض", "أحمر", ""]; // مكرونة أبيض وأحمر فقط
             } else if (catName.includes("شاورما عربي")) {
                 labels = ["السعر", "", ""];
             } else if (catName.includes("شاورما")) {
@@ -134,14 +134,14 @@
             }
 
             menuData[catName].forEach(item => {
-                let html = `<div class="price-card p-4 mb-4 shadow-lg border-white/5">
+                let html = `<div class="price-card p-4 mb-4 shadow-md">
                     <h3 class="font-bold text-zinc-100 text-lg mb-4 text-right">${item.name}</h3>
                     <div class="flex gap-2">`;
 
                 item.prices.forEach((p, i) => {
                     if (p && p !== "" && p !== 0) {
-                        html += `<div onclick="addToCart('${item.name} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-600/20 transition-all">
-                            <span class="block text-[10px] text-zinc-500 mb-1">${labels[i]}</span>
+                        html += `<div onclick="addToCart('${item.category}', '${item.name} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/60 p-3 rounded-2xl border border-white/5 relative cursor-pointer text-center active:bg-red-600/30 transition-all">
+                            <span class="block text-[10px] text-zinc-400 mb-1">${labels[i]}</span>
                             <span class="text-white font-bold">${p}ج</span>
                             <div class="plus-icon">+</div>
                         </div>`;
@@ -152,34 +152,36 @@
             });
         }
 
-        function addToCart(name, price) {
+        function addToCart(cat, name, price) {
             const existing = cart.find(i => i.name === name);
-            if (existing) existing.qty++;
-            else cart.push({ name, price, qty: 1 });
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ cat, name, price, qty: 1 });
+            }
             updateCartUI();
         }
 
         function updateCartUI() {
-            const count = cart.reduce((s, i) => s + i.qty, 0);
-            document.getElementById('cart-count').innerText = count;
+            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
         }
 
         function openCart() {
-            if (cart.length === 0) return alert("السلة فارغة، أضف بعض الطلبات أولاً!");
+            if (cart.length === 0) return alert("السلة فارغة!");
             const list = document.getElementById('cart-items-list');
             list.innerHTML = "";
             let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
-                list.innerHTML += `<div class="flex justify-between items-center bg-black p-3 rounded-xl border border-zinc-800">
-                    <button onclick="removeFromCart(${index})" class="text-red-500 text-xs px-2">حذف</button>
-                    <div>
+                list.innerHTML += `<div class="flex justify-between items-center bg-black p-4 rounded-xl border border-zinc-800">
+                    <button onclick="removeFromCart(${index})" class="text-red-500 font-bold px-3">حذف</button>
+                    <div class="text-right">
                         <div class="text-white font-bold text-sm">${item.name}</div>
-                        <div class="text-zinc-500 text-[10px]">${item.qty} x ${item.price}ج = ${item.qty * item.price}ج</div>
+                        <div class="text-zinc-500 text-xs mt-1">[${item.cat}] - ${item.qty} × ${item.price}ج</div>
                     </div>
                 </div>`;
             });
-            document.getElementById('total-price-display').innerText = `الإجمالي: ${total} جنيه`;
+            document.getElementById('total-price-display').innerText = `إجمالي الحساب: ${total} جنيه`;
             document.getElementById('checkout-modal').classList.remove('hidden');
         }
 
@@ -195,15 +197,23 @@
             const name = document.getElementById('user-name').value.trim();
             const phone = document.getElementById('user-phone').value.trim();
             const addr = document.getElementById('user-address').value.trim();
-            if (!name || !phone || !addr) return alert("من فضلك أكمل بيانات التوصيل!");
             
-            let msg = `*طلب جديد من منيو توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${addr}\n\n🛒 *الطلبات:*\n`;
+            if (!name || !phone || !addr) return alert("أكمل بيانات التوصيل أولاً!");
+            
+            let msg = `*طلب جديد من منيو توستا*\n\n`;
+            msg += `👤 *الاسم:* ${name}\n`;
+            msg += `📞 *الموبايل:* ${phone}\n`;
+            msg += `📍 *العنوان:* ${addr}\n\n`;
+            msg += `🛒 *الطلبات:*\n`;
+            
             let total = 0;
             cart.forEach(i => {
-                msg += `• ${i.name} (x${i.qty}) = ${i.qty * i.price}ج\n`;
+                // إضافة اسم القسم جنب الطلب في رسالة الواتساب
+                msg += `• ${i.name} [${i.cat}] (عدد ${i.qty}) = ${i.qty * i.price}ج\n`;
                 total += i.qty * i.price;
             });
-            msg += `\n💰 *الإجمالي:* ${total} جنيه`;
+            
+            msg += `\n💰 *الإجمالي النهائي:* ${total} جنيه`;
             window.open(`https://wa.me/${restaurantPhone}?text=${encodeURIComponent(msg)}`);
         }
         window.onload = fetchMenu;
