@@ -34,20 +34,15 @@
     <div id="checkout-modal" class="fixed inset-0 z-[60] overflow-y-auto p-4">
         <div class="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-6 mt-10 border border-zinc-700 shadow-2xl">
             <h2 class="text-2xl font-bold mb-4 text-red-500 text-center">تأكيد طلبك</h2>
-            
-            <div id="cart-items-list" class="mb-6 max-h-60 overflow-y-auto space-y-3"></div>
-            
+            <div id="cart-items-list" class="mb-6 max-h-60 overflow-y-auto space-y-3 text-right"></div>
             <div id="total-price-display" class="text-center font-bold text-xl mb-6 text-white bg-zinc-800 py-3 rounded-xl"></div>
-            
             <div class="space-y-4">
-                <p class="text-zinc-400 text-sm mr-2">بيانات التوصيل:</p>
-                <input type="text" id="user-name" placeholder="الاسم بالكامل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl focus:border-red-600 outline-none text-white text-right">
-                <input type="tel" id="user-phone" placeholder="رقم الهاتف" class="w-full bg-black border border-zinc-700 p-3 rounded-xl focus:border-red-600 outline-none text-white text-right">
-                <textarea id="user-address" placeholder="العنوان بالتفصيل (المنطقة، الشارع، علامة مميزة)" class="w-full bg-black border border-zinc-700 p-3 rounded-xl focus:border-red-600 outline-none h-24 text-white text-right"></textarea>
+                <input type="text" id="user-name" placeholder="الاسم بالكامل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl text-white text-right outline-none focus:border-red-600">
+                <input type="tel" id="user-phone" placeholder="رقم الموبايل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl text-white text-right outline-none focus:border-red-600">
+                <textarea id="user-address" placeholder="العنوان بالتفصيل" class="w-full bg-black border border-zinc-700 p-3 rounded-xl text-white text-right outline-none h-24 focus:border-red-600"></textarea>
             </div>
-
             <div class="mt-8 flex gap-3">
-                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-green-900/20">إرسال للواتساب</button>
+                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition">إرسال للواتساب</button>
                 <button onclick="closeCart()" class="px-6 bg-zinc-800 text-zinc-400 rounded-xl">إلغاء</button>
             </div>
         </div>
@@ -55,7 +50,7 @@
 
     <script>
         const sheetId = '17SgECDAROBvoG2nakrWg2gjgD2DvctsxKFL-turn6-Q';
-        const restaurantPhone = "201014163994"; // تم التحديث لرقمك
+        const restaurantPhone = "201014163994";
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
         let menuData = {};
@@ -81,7 +76,7 @@
 
                 renderNav();
                 renderCategory(Object.keys(menuData)[0]);
-            } catch (e) { console.error("Error fetching data:", e); }
+            } catch (e) { console.error(e); }
         }
 
         function renderNav() {
@@ -104,12 +99,11 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = `<h2 class="text-xl font-bold mb-6 text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> ${catName}</h2>`;
             
-            // تحديد أسماء الأحجام بناءً على القسم
+            // تحديد التسميات بناءً على القسم وبعدد الأسعار المتاحة
             let labels = ["صغير", "وسط", "كبير"];
             if (catName.includes("برجر")) labels = ["فراخ", "لحمة", ""];
             else if (catName.includes("شاورما") && !catName.includes("ريزو")) labels = ["فينو", "سوري", "XL"];
             else if (catName.includes("كريب حادق")) labels = ["عادي", "كونو", "سوبر"];
-            else if (catName.includes("بيتزا") || catName.includes("فطير")) labels = ["صغير", "وسط", "كبير"]; // لضمان ظهور الـ 3 في البيتزا
             else if (catName.includes("إضافات") || catName.includes("وجبات") || catName.includes("ريزو")) labels = ["السعر", "", ""];
 
             menuData[catName].forEach(item => {
@@ -118,15 +112,16 @@
                 let desc = parts[1] ? '(' + parts[1] : "";
 
                 let html = `<div class="price-card p-4 mb-4">
-                    <div class="mb-4">
+                    <div class="mb-4 text-right">
                         <h3 class="font-bold text-zinc-100 text-lg">${title}</h3>
                         <p class="text-[11px] text-zinc-500 mt-1">${desc}</p>
                     </div>
                     <div class="flex gap-2 text-center">`;
 
                 item.prices.forEach((p, i) => {
-                    if (p && labels[i]) {
-                        html += `<div onclick="addToCart('${title} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative">
+                    // تم تعديل الشرط هنا ليعرض السعر طالما القيمة موجودة في الشيت
+                    if (p !== null && p !== undefined && p !== "" && labels[i] !== "") {
+                        html += `<div onclick="addToCart('${title} (${labels[i]})', ${p})" class="flex-1 bg-zinc-800/40 p-3 rounded-2xl border border-white/5 active:scale-95 transition relative cursor-pointer">
                             <span class="block text-[10px] text-zinc-500 mb-1">${labels[i]}</span>
                             <span class="text-white font-bold text-md">${p}ج</span>
                             <div class="plus-icon">+</div>
@@ -143,11 +138,6 @@
             if (existing) existing.qty++;
             else cart.push({ name, price, qty: 1 });
             updateCartCount();
-            
-            // تأثير بصري خفيف عند الإضافة
-            const cartBtn = document.getElementById('cart-btn');
-            cartBtn.classList.add('scale-110', 'bg-red-600');
-            setTimeout(() => cartBtn.classList.remove('scale-110', 'bg-red-600'), 200);
         }
 
         function updateCartCount() {
@@ -156,20 +146,20 @@
         }
 
         function openCart() {
-            if (cart.length === 0) return alert("السلة فارغة، أضف بعض الأصناف أولاً!");
+            if (cart.length === 0) return alert("السلة فارغة!");
             const list = document.getElementById('cart-items-list');
             list.innerHTML = "";
             let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
                 list.innerHTML += `<div class="flex justify-between items-center bg-black p-3 rounded-xl border border-zinc-800">
-                    <div class="flex flex-col text-right">
-                        <span class="text-white font-bold text-sm">${item.name}</span>
-                        <span class="text-zinc-500 text-[10px]">${item.price}ج للواحد</span>
+                    <div class="text-right">
+                        <div class="text-white font-bold text-sm">${item.name}</div>
+                        <div class="text-zinc-500 text-[10px]">${item.price}ج</div>
                     </div>
                     <div class="flex items-center gap-3">
-                         <span class="text-red-500 font-bold">${item.qty}x</span>
-                         <button onclick="removeFromCart(${index})" class="text-zinc-600 text-xs">حذف</button>
+                        <span class="text-red-500 font-bold">${item.qty}x</span>
+                        <button onclick="removeFromCart(${index})" class="text-zinc-600 text-xs">حذف</button>
                     </div>
                 </div>`;
             });
@@ -190,25 +180,15 @@
             const name = document.getElementById('user-name').value.trim();
             const phone = document.getElementById('user-phone').value.trim();
             const address = document.getElementById('user-address').value.trim();
+            if (!name || !phone || !address) return alert("اكمل البيانات أولاً!");
 
-            if (!name || !phone || !address) return alert("من فضلك أدخل الاسم ورقم الهاتف والعنوان بالكامل!");
-
-            let msg = `*طلب جديد من منيو توستا*\n\n`;
-            msg += `👤 *الاسم:* ${name}\n`;
-            msg += `📞 *الموبايل:* ${phone}\n`;
-            msg += `📍 *العنوان:* ${address}\n`;
-            msg += `─────────────────\n`;
-            msg += `🛒 *الأصناف المطلوبة:*\n`;
-            
+            let msg = `*طلب جديد من منيو توستا*\n\n👤 *الاسم:* ${name}\n📞 *الموبايل:* ${phone}\n📍 *العنوان:* ${address}\n─────────────────\n🛒 *الطلبات:*\n`;
             let total = 0;
             cart.forEach(i => {
                 msg += `• ${i.qty} x ${i.name} = ${i.qty * i.price}ج\n`;
                 total += i.qty * i.price;
             });
-            
-            msg += `─────────────────\n`;
-            msg += `💰 *الإجمالي النهائي:* ${total} جنيه`;
-            
+            msg += `─────────────────\n💰 *الإجمالي:* ${total} جنيه`;
             window.open(`https://wa.me/${restaurantPhone}?text=${encodeURIComponent(msg)}`);
         }
 
