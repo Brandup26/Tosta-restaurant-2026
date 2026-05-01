@@ -146,21 +146,22 @@
 
             menuData[catName].forEach(item => {
                 if (isMeal) {
-                    // تصميم الوجبات الاحترافي مع تفعيل السلة
-                    let price = item.prices[0] || 0;
-                    container.innerHTML += `
-                        <div class="meal-card">
-                            <div class="meal-info">
-                                <h3 class="font-bold text-lg text-white mb-1">${item.name}</h3>
-                                <p class="text-zinc-500 text-xs">وجبة توستا المميزة</p>
-                            </div>
-                            <div onclick="addToCart('${item.category}', '${item.name}', ${price})" class="meal-price-btn">
-                                <span class="text-sm">اضافة</span>
-                                <span class="text-lg font-black">${price}ج</span>
-                            </div>
-                        </div>`;
+                    // العثور على أول سعر غير صفري
+                    let price = item.prices.find(p => p && p !== 0) || 0;
+                    if (price > 0) {
+                        container.innerHTML += `
+                            <div class="meal-card">
+                                <div class="meal-info">
+                                    <h3 class="font-bold text-lg text-white mb-1">${item.name}</h3>
+                                    <p class="text-zinc-500 text-xs">وجبة توستا المميزة</p>
+                                </div>
+                                <div onclick="addToCart('${item.category}', '${item.name}', ${price})" class="meal-price-btn">
+                                    <span style="font-size: 10px; opacity: 0.8; margin-bottom: 2px;">إضافة</span>
+                                    <span class="text-lg font-black">${price}ج</span>
+                                </div>
+                            </div>`;
+                    }
                 } else {
-                    // التصميم العادي
                     let html = `<div class="price-card"><h3 class="font-bold text-zinc-100 mb-4 text-right">${item.name}</h3><div class="flex gap-2">`;
                     item.prices.forEach((p, i) => {
                         if (p && p !== "" && p !== 0) {
@@ -189,7 +190,6 @@
             list.innerHTML = ""; let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
-                // إزالة التكرار: إذا كان الاسم يحتوي على اسم القسم، نظفه
                 let cleanCat = item.cat.replace("ركن ", "").replace("قسم ", "").trim();
                 let cleanName = item.name.replace(cleanCat, "").trim();
                 
